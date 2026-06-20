@@ -65,6 +65,7 @@ export async function handleAnomalyRoutes(req, res, send, readBody) {
     if (result.error) {
       const statusMap = {
         batch_not_found: 404,
+        batch_site_mismatch: 409,
         anomaly_not_found: 404,
         anomaly_already_handled: 409
       };
