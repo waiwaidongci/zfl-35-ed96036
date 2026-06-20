@@ -1030,18 +1030,27 @@ curl http://localhost:3035/labels/batches/RS-001
 ```json
 {
   "batchId": "RS-001",
+  "siteId": "SITE-001",
+  "siteName": "主冷库",
   "species": "独叶草",
   "collectionPlace": "西岭北坡",
   "motherPlant": "MP-17",
   "quantity": 1800,
   "quantityFormatted": "1,800",
+  "availableQuantity": 1800,
+  "availableQuantityFormatted": "1,800",
+  "frozenQuantity": 0,
   "viability": "high",
   "viabilityLabel": "高活性",
+  "riskLevel": "warning",
+  "riskLevelLabel": "警告",
+  "pendingAnomalyCount": 3,
   "coldBoxLocation": "A2低温区 / 冷盒08 / 格位1",
   "section": "A2",
   "container": "C-冷盒-08",
   "slotLocations": [
     {
+      "siteId": "SITE-001",
       "sectionId": "A2",
       "sectionName": "A2低温区",
       "boxId": "C-冷盒-08",
@@ -1086,10 +1095,43 @@ curl "http://localhost:3035/labels/batches?section=A2&viability=high"
 [
   {
     "batchId": "RS-001",
+    "siteId": "SITE-001",
+    "siteName": "主冷库",
     "species": "独叶草",
-    ...
-  },
-  ...
+    "collectionPlace": "西岭北坡",
+    "motherPlant": "MP-17",
+    "quantity": 1800,
+    "quantityFormatted": "1,800",
+    "availableQuantity": 1800,
+    "availableQuantityFormatted": "1,800",
+    "frozenQuantity": 0,
+    "viability": "high",
+    "viabilityLabel": "高活性",
+    "riskLevel": "warning",
+    "riskLevelLabel": "警告",
+    "pendingAnomalyCount": 3,
+    "coldBoxLocation": "A2低温区 / 冷盒08 / 格位1",
+    "section": "A2",
+    "container": "C-冷盒-08",
+    "slotLocations": [
+      {
+        "siteId": "SITE-001",
+        "sectionId": "A2",
+        "sectionName": "A2低温区",
+        "boxId": "C-冷盒-08",
+        "boxName": "冷盒08",
+        "slotIndex": 1
+      }
+    ],
+    "latestGermination": {
+      "at": "2026-06-12",
+      "sampled": 100,
+      "sprouted": 72,
+      "rate": 0.72,
+      "rateFormatted": "72.0%"
+    },
+    "printedAt": "2026-06-20T...Z"
+  }
 ]
 ```
 
@@ -1115,8 +1157,75 @@ curl -X POST http://localhost:3035/labels/batches/batch \
 
 ```json
 [
-  { "batchId": "RS-001", "species": "独叶草", ... },
-  { "batchId": "RS-002", "species": "珙桐", ... }
+  {
+    "batchId": "RS-001",
+    "siteId": "SITE-001",
+    "siteName": "主冷库",
+    "species": "独叶草",
+    "collectionPlace": "西岭北坡",
+    "motherPlant": "MP-17",
+    "quantity": 1800,
+    "quantityFormatted": "1,800",
+    "availableQuantity": 1800,
+    "availableQuantityFormatted": "1,800",
+    "frozenQuantity": 0,
+    "viability": "high",
+    "viabilityLabel": "高活性",
+    "riskLevel": "warning",
+    "riskLevelLabel": "警告",
+    "pendingAnomalyCount": 3,
+    "coldBoxLocation": "A2低温区 / 冷盒08 / 格位1",
+    "section": "A2",
+    "container": "C-冷盒-08",
+    "slotLocations": [
+      {
+        "siteId": "SITE-001",
+        "sectionId": "A2",
+        "sectionName": "A2低温区",
+        "boxId": "C-冷盒-08",
+        "boxName": "冷盒08",
+        "slotIndex": 1
+      }
+    ],
+    "latestGermination": {
+      "at": "2026-06-12",
+      "sampled": 100,
+      "sprouted": 72,
+      "rate": 0.72,
+      "rateFormatted": "72.0%"
+    },
+    "printedAt": "2026-06-20T...Z"
+  },
+  {
+    "batchId": "RS-002",
+    "siteId": "SITE-001",
+    "siteName": "主冷库",
+    "species": "珙桐",
+    "collectionPlace": "峨眉山",
+    "motherPlant": "MP-23",
+    "quantity": 950,
+    "quantityFormatted": "950",
+    "availableQuantity": 950,
+    "availableQuantityFormatted": "950",
+    "frozenQuantity": 0,
+    "viability": "medium",
+    "viabilityLabel": "中活性",
+    "riskLevel": "critical",
+    "riskLevelLabel": "严重",
+    "pendingAnomalyCount": 0,
+    "coldBoxLocation": "A2 / C-冷盒-09",
+    "section": "A2",
+    "container": "C-冷盒-09",
+    "slotLocations": [],
+    "latestGermination": {
+      "at": "2026-05-20",
+      "sampled": 100,
+      "sprouted": 55,
+      "rate": 0.55,
+      "rateFormatted": "55.0%"
+    },
+    "printedAt": "2026-06-20T...Z"
+  }
 ]
 ```
 
