@@ -436,6 +436,309 @@ curl -X POST http://localhost:3035/batches/RS-001/reservations/RES-1718888888888
 | `insufficient_available_quantity` | 409 | 可用库存不足，无法批准 |
 | `negative_inventory_blocked` | 409 | 库存不足，转实际取样会导致负库存 |
 
+## 温度异常事件模块
+
+自动识别冷藏温度超过阈值的时间点并生成异常事件，支持查看未处理异常、按批次查看异常历史、标记处理结果和处理人。
+
+### 阈值规则
+
+| 阈值类型 | 温度值 | 说明 |
+|---------|--------|------|
+| 默认阈值 | `-18°C` | 温度高于此值即视为异常 |
+| 警告级 | `-15°C` | 温度 ≥ -15°C 标记为 `warning`（警告） |
+| 严重级 | `-10°C` | 温度 ≥ -10°C 标记为 `critical`（严重） |
+| 一般异常 | `< -15°C` 且 `> -18°C` | 标记为 `abnormal`（异常） |
+
+**判断逻辑**：当 `temperature.value > threshold` 时判定为异常。阈值可在扫描时通过参数自定义。
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/anomalies/pending` | 查看所有未处理异常 |
+| GET | `/batches/:id/anomalies?status=` | 按批次查看异常历史（可按状态筛选） |
+| PATCH | `/batches/:id/anomalies/:anomalyId/handle` | 标记异常处理结果和处理人 |
+| POST | `/anomalies/scan?batchId=&threshold=` | 手动触发异常扫描（可指定批次和自定义阈值） |
+
+### 数据结构
+
+#### 批次字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `anomalies` | array | 温度异常事件列表 |
+
+#### 异常事件字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 异常事件ID（格式 `ANOM-时间戳-随机串`） |
+| `batchId` | string | 关联批次ID |
+| `temperatureAt` | string | 异常温度记录时间（ISO格式） |
+| `temperatureValue` | number | 异常温度值 |
+| `threshold` | number | 判断时使用的阈值 |
+| `severity` | string | 严重程度：`abnormal`/`warning`/`critical` |
+| `status` | string | 状态：`pending`（待处理）、`handled`（已处理） |
+| `detectedAt` | string | 检测时间（ISO格式） |
+| `handledAt` | string | 处理时间（ISO格式，仅已处理） |
+| `handler` | string | 处理人（仅已处理） |
+| `handlingResult` | string | 处理结果：`resolved`（已解决）、`ignored`（已忽略）、`escalated`（已升级） |
+| `note` | string | 处理备注 |
+
+### 接口详情
+
+#### GET `/anomalies/pending` — 查看未处理异常
+
+获取所有状态为 `pending` 的异常事件，按检测时间从早到晚排序。
+
+**请求示例：**
+
+```bash
+curl http://localhost:3035/anomalies/pending
+```
+
+**响应示例：**
+
+```json
+[
+  {
+    "id": "ANOM-1718888888888-abc123",
+    "batchId": "RS-001",
+    "batchSpecies": "独叶草",
+    "batchSection": "A2",
+    "temperatureAt": "2026-06-02T08:00:00.000Z",
+    "temperatureValue": -17.2,
+    "threshold": -18,
+    "severity": "abnormal",
+    "status": "pending",
+    "detectedAt": "2026-06-20T10:00:00.000Z",
+    "handledAt": null,
+    "handler": null,
+    "handlingResult": null,
+    "note": null
+  },
+  {
+    "id": "ANOM-1718888888889-def456",
+    "batchId": "RS-001",
+    "batchSpecies": "独叶草",
+    "batchSection": "A2",
+    "temperatureAt": "2026-06-03T08:00:00.000Z",
+    "temperatureValue": -12.5,
+    "threshold": -18,
+    "severity": "warning",
+    "status": "pending",
+    "detectedAt": "2026-06-20T10:00:00.000Z",
+    "handledAt": null,
+    "handler": null,
+    "handlingResult": null,
+    "note": null
+  }
+]
+```
+
+#### GET `/batches/:id/anomalies?status=` — 按批次查看异常历史
+
+获取指定批次的所有异常事件，可按状态筛选。
+
+**请求示例：**
+
+```bash
+# 查看批次所有异常
+curl http://localhost:3035/batches/RS-001/anomalies
+
+# 仅查看未处理异常
+curl "http://localhost:3035/batches/RS-001/anomalies?status=pending"
+
+# 仅查看已处理异常
+curl "http://localhost:3035/batches/RS-001/anomalies?status=handled"
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "batchSpecies": "独叶草",
+  "anomalies": [
+    {
+      "id": "ANOM-1718888888888-abc123",
+      "batchId": "RS-001",
+      "temperatureAt": "2026-06-02T08:00:00.000Z",
+      "temperatureValue": -17.2,
+      "threshold": -18,
+      "severity": "abnormal",
+      "status": "pending",
+      "detectedAt": "2026-06-20T10:00:00.000Z",
+      "handledAt": null,
+      "handler": null,
+      "handlingResult": null,
+      "note": null
+    }
+  ]
+}
+```
+
+#### PATCH `/batches/:id/anomalies/:anomalyId/handle` — 标记处理结果
+
+将 `pending` 状态的异常标记为已处理，记录处理人、处理结果和备注。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `handler` | string | 否 | 处理人，默认"未知管理员" |
+| `handlingResult` | string | 否 | 处理结果：`resolved`/`ignored`/`escalated`，默认`resolved` |
+| `note` | string | 否 | 处理备注 |
+
+**请求示例：**
+
+```bash
+curl -X PATCH http://localhost:3035/batches/RS-001/anomalies/ANOM-1718888888888-abc123/handle \
+  -H "Content-Type: application/json" \
+  -d '{
+    "handler": "王工程师",
+    "handlingResult": "resolved",
+    "note": "冷库压缩机故障已修复，温度已恢复正常"
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "anomaly": {
+    "id": "ANOM-1718888888888-abc123",
+    "batchId": "RS-001",
+    "temperatureAt": "2026-06-02T08:00:00.000Z",
+    "temperatureValue": -17.2,
+    "threshold": -18,
+    "severity": "abnormal",
+    "status": "handled",
+    "detectedAt": "2026-06-20T10:00:00.000Z",
+    "handledAt": "2026-06-20T14:30:00.000Z",
+    "handler": "王工程师",
+    "handlingResult": "resolved",
+    "note": "冷库压缩机故障已修复，温度已恢复正常"
+  }
+}
+```
+
+#### POST `/anomalies/scan?batchId=&threshold=` — 手动触发异常扫描
+
+扫描所有批次或指定批次的温度记录，检测并生成新的异常事件。可自定义阈值。
+
+**请求示例：**
+
+```bash
+# 扫描所有批次，使用默认阈值 -18°C
+curl -X POST http://localhost:3035/anomalies/scan
+
+# 仅扫描指定批次
+curl -X POST "http://localhost:3035/anomalies/scan?batchId=RS-001"
+
+# 使用自定义阈值 -20°C
+curl -X POST "http://localhost:3035/anomalies/scan?threshold=-20"
+
+# 同时指定批次和阈值
+curl -X POST "http://localhost:3035/anomalies/scan?batchId=RS-001&threshold=-20"
+```
+
+**响应示例：**
+
+```json
+{
+  "detected": 3,
+  "anomalies": [
+    {
+      "id": "ANOM-1718888888888-abc123",
+      "batchId": "RS-001",
+      "temperatureAt": "2026-06-02T08:00:00.000Z",
+      "temperatureValue": -17.2,
+      "threshold": -18,
+      "severity": "abnormal",
+      "status": "pending",
+      "detectedAt": "2026-06-20T10:00:00.000Z",
+      "handledAt": null,
+      "handler": null,
+      "handlingResult": null,
+      "note": null
+    }
+  ]
+}
+```
+
+#### POST `/batches/:id/temperatures` — 自动异常检测
+
+新增温度记录后会自动触发该批次的异常扫描，新检测到的异常会一并返回。
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/RS-001/temperatures \
+  -H "Content-Type: application/json" \
+  -d '{ "value": -16.5 }'
+```
+
+**响应示例（新增）：**
+
+```json
+{
+  "batch": { ... },
+  "anomaliesDetected": 1,
+  "newAnomalies": [
+    {
+      "id": "ANOM-1718888888888-abc123",
+      "batchId": "RS-001",
+      "temperatureAt": "2026-06-20T10:00:00.000Z",
+      "temperatureValue": -16.5,
+      "threshold": -18,
+      "severity": "abnormal",
+      "status": "pending",
+      "detectedAt": "2026-06-20T10:00:00.000Z",
+      "handledAt": null,
+      "handler": null,
+      "handlingResult": null,
+      "note": null
+    }
+  ]
+}
+```
+
+### 库存报告（更新）
+
+`GET /reports/inventory` 接口新增受异常影响的批次统计。
+
+**响应示例（新增字段）：**
+
+```json
+{
+  "total": 1800,
+  "totalFrozen": 0,
+  "totalAvailable": 1800,
+  "totalBatches": 1,
+  "batchesWithAnomalies": 1,
+  "batchesWithPendingAnomalies": 1,
+  ...
+}
+```
+
+新增字段说明：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `totalBatches` | number | 批次总数 |
+| `batchesWithAnomalies` | number | 曾发生过温度异常的批次数量 |
+| `batchesWithPendingAnomalies` | number | 存在未处理异常的批次数量 |
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `batch_not_found` | 404 | 批次不存在 |
+| `anomaly_not_found` | 404 | 异常事件不存在 |
+| `anomaly_already_handled` | 409 | 异常已处理，不可重复标记 |
+
 冷库按 **分区（Section）→ 冷盒（Box）→ 格位（Slot）** 三级结构管理。现有批次的 `section` 和 `container` 字段保持不变，库位模块通过 `batchId` 关联格位与批次。
 
 ### 接口一览
