@@ -10,8 +10,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = join(__dirname, "..", "data", "rare-seeds.json");
 
 async function loadDb() {
-  if (!existsSync(dbPath)) return { batches: [] };
+  if (!existsSync(dbPath)) return { batches: [], sites: [] };
   return JSON.parse(await readFile(dbPath, "utf8"));
+}
+
+function buildSiteMap(db) {
+  const map = {};
+  for (const site of (db.sites || [])) {
+    map[site.id] = site;
+  }
+  return map;
 }
 
 async function getBatchSlotLocations(batchIds) {
@@ -28,10 +36,11 @@ const routes = [
     pattern: /^\/labels\/batches\/([^/]+)$/,
     handler: async (_req, _res, _body, params) => {
       const db = await loadDb();
+      const siteMap = buildSiteMap(db);
       const batch = db.batches.find(b => b.id === params[1]);
       if (!batch) return { error: "batch_not_found" };
       const slotLocations = await locationStore.getBatchLocations(batch.id);
-      return buildLabel(batch, slotLocations);
+      return buildLabel(batch, slotLocations, siteMap);
     }
   },
   {
@@ -39,6 +48,7 @@ const routes = [
     pattern: /^\/labels\/batches$/,
     handler: async (req) => {
       const db = await loadDb();
+      const siteMap = buildSiteMap(db);
       const url = new URL(req.url, `http://${req.headers.host}`);
       let batches = db.batches;
       const defaultSiteId = getDefaultSiteId(db);
@@ -55,7 +65,7 @@ const routes = [
       }
       const batchIds = batches.map(b => b.id);
       const slotLocationsMap = await getBatchSlotLocations(batchIds);
-      return buildLabels(batches, slotLocationsMap);
+      return buildLabels(batches, slotLocationsMap, siteMap);
     }
   },
   {
@@ -63,11 +73,12 @@ const routes = [
     pattern: /^\/labels\/batches\/batch$/,
     handler: async (_req, _res, body) => {
       const db = await loadDb();
+      const siteMap = buildSiteMap(db);
       const ids = body.ids || [];
       const batches = db.batches.filter(b => ids.includes(b.id));
       const batchIds = batches.map(b => b.id);
       const slotLocationsMap = await getBatchSlotLocations(batchIds);
-      return buildLabels(batches, slotLocationsMap);
+      return buildLabels(batches, slotLocationsMap, siteMap);
     }
   }
 ];

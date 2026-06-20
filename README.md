@@ -991,13 +991,21 @@ curl -X POST http://localhost:3035/batches/RS-001/temperatures \
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `batchId` | string | 批次号 |
+| `siteId` | string | 所属站点ID |
+| `siteName` | string | 站点名称 |
 | `species` | string | 物种名称 |
 | `collectionPlace` | string | 采集地 |
 | `motherPlant` | string | 母株编号 |
-| `quantity` | number | 当前数量（原始值） |
-| `quantityFormatted` | string | 当前数量（格式化，千分位） |
+| `quantity` | number | 当前总数量（原始值） |
+| `quantityFormatted` | string | 当前总数量（格式化，千分位） |
+| `availableQuantity` | number | 可用库存（总数量 - 冻结库存） |
+| `availableQuantityFormatted` | string | 可用库存（格式化，千分位） |
+| `frozenQuantity` | number | 冻结库存（已批准预约的数量） |
 | `viability` | string | 活性等级原始值（high/medium/low/unknown） |
 | `viabilityLabel` | string | 活性等级中文标签 |
+| `riskLevel` | string | 活性风险等级原始值（normal/warning/critical/unknown） |
+| `riskLevelLabel` | string | 活性风险等级中文标签 |
+| `pendingAnomalyCount` | number | 未处理温度异常数量 |
 | `coldBoxLocation` | string | 冷盒位置描述文本 |
 | `section` | string | 所属分区 |
 | `container` | string | 冷盒编号 |
