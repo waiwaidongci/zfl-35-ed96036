@@ -1641,3 +1641,262 @@ curl "http://localhost:3035/batches?riskLevel=warning&section=A2"
 | 错误码 | HTTP状态 | 说明 |
 |--------|----------|------|
 | `batch_not_found` | 404 | 批次不存在 |
+
+## 批次导入预览模块
+
+支持一次性提交一组待入库批次 JSON，先返回字段校验结果、重复批次号、数量异常和可导入行摘要，确认后再真正写入 batches 并生成 collect 流水。导入确认时通过数据库指纹机制防止预览后数据变化导致重复写入。
+
+### 核心概念
+
+- **两阶段导入**：先 `preview`（预览校验），再 `confirm`（确认写入），避免直接写入脏数据
+- **预览令牌（previewToken）**：预览成功后返回唯一令牌，确认时需携带此令牌
+- **数据库指纹（fingerprint）**：预览时记录当前数据库状态的 MD5 摘要，确认时校验指纹是否一致。若预览后有人修改了批次数据（新增/删除/修改数量），指纹会变化，确认将被拒绝
+- **令牌有效期**：预览令牌 30 分钟内有效，过期需重新预览
+- **导入限制**：单次导入不超过 1000 条
+
+### 校验规则
+
+#### 必填字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 批次号（非空字符串） |
+| `species` | string | 物种名称 |
+| `quantity` | number | 数量（正整数，最大 10,000,000） |
+
+#### 可选字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `collectionPlace` | string | 采集地 |
+| `motherPlant` | string | 母株编号 |
+| `container` | string | 冷盒编号 |
+| `section` | string | 分区 |
+| `viability` | string | 活性等级：`high`/`medium`/`low`/`unknown`，不合法值会被设为 `unknown` |
+| `remark` | string | 备注 |
+
+#### 校验项
+
+| 校验项 | 级别 | 说明 |
+|--------|------|------|
+| `missing_required_field` | 错误 | 缺少必填字段 |
+| `invalid_field_type` | 错误 | 字段类型不正确 |
+| `duplicate_id_existing` | 错误 | 批次号与系统中已有批次重复 |
+| `duplicate_id_in_import` | 错误 | 批次号在导入列表内重复 |
+| `quantity_not_positive` | 错误 | 数量不为正数 |
+| `quantity_too_large` | 错误 | 数量超过 10,000,000 |
+| `invalid_viability` | 警告 | 活性等级值不合法，将被设为 `unknown` |
+| `non_integer_quantity` | 警告 | 数量非整数，将被截断 |
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/imports/preview` | 预览导入：校验并返回预览结果 |
+| POST | `/imports/confirm` | 确认导入：写入批次并生成 collect 流水 |
+
+### 接口详情
+
+#### POST `/imports/preview` — 预览导入
+
+提交一批待入库批次数据，系统进行校验并返回详细结果。返回结果中仅校验通过的行可被确认导入。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `batches` | array | 是 | 待导入批次对象数组 |
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/imports/preview \
+  -H "Content-Type: application/json" \
+  -d '{
+    "batches": [
+      {
+        "id": "RS-010",
+        "species": "红豆杉",
+        "quantity": 2000,
+        "collectionPlace": "秦岭南坡",
+        "motherPlant": "MP-22",
+        "container": "C-冷盒-15",
+        "section": "B1",
+        "viability": "high"
+      },
+      {
+        "id": "RS-011",
+        "species": "珙桐",
+        "quantity": 1500,
+        "collectionPlace": "神农架",
+        "container": "C-冷盒-16",
+        "section": "B1"
+      },
+      {
+        "id": "RS-010",
+        "species": "水杉",
+        "quantity": 500
+      },
+      {
+        "id": "RS-012",
+        "species": "望天树",
+        "quantity": -100
+      },
+      {
+        "id": "RS-001",
+        "species": "独叶草",
+        "quantity": 300
+      }
+    ]
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "previewToken": "IMP-1718888888888-abc123",
+  "fingerprint": "a1b2c3d4e5f6...",
+  "totalRows": 5,
+  "importableCount": 1,
+  "invalidCount": 4,
+  "importableRows": [
+    {
+      "index": 1,
+      "id": "RS-011",
+      "species": "珙桐",
+      "quantity": 1500,
+      "warnings": []
+    }
+  ],
+  "duplicateIds": [
+    { "id": "RS-010", "count": 2 }
+  ],
+  "duplicateExistingIds": ["RS-001"],
+  "quantityAnomalies": [
+    {
+      "index": 3,
+      "id": "RS-012",
+      "quantity": -100,
+      "issues": [
+        { "code": "quantity_not_positive", "field": "quantity", "message": "quantity 必须大于0" }
+      ]
+    }
+  ],
+  "validationResults": [
+    {
+      "index": 0,
+      "id": "RS-010",
+      "valid": false,
+      "errors": [
+        { "code": "duplicate_id_in_import", "field": "id", "message": "批次号 RS-010 在导入列表中重复出现 2 次" }
+      ],
+      "warnings": []
+    },
+    {
+      "index": 1,
+      "id": "RS-011",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "index": 2,
+      "id": "RS-010",
+      "valid": false,
+      "errors": [
+        { "code": "duplicate_id_in_import", "field": "id", "message": "批次号 RS-010 在导入列表中重复出现 2 次" }
+      ],
+      "warnings": []
+    },
+    {
+      "index": 3,
+      "id": "RS-012",
+      "valid": false,
+      "errors": [
+        { "code": "quantity_not_positive", "field": "quantity", "message": "quantity 必须大于0" }
+      ],
+      "warnings": []
+    },
+    {
+      "index": 4,
+      "id": "RS-001",
+      "valid": false,
+      "errors": [
+        { "code": "duplicate_id_existing", "field": "id", "message": "批次号 RS-001 已存在于系统中" }
+      ],
+      "warnings": []
+    }
+  ]
+}
+```
+
+#### POST `/imports/confirm` — 确认导入
+
+使用预览令牌确认导入。系统会校验令牌有效性、数据库指纹一致性以及批次号是否仍无冲突，全部通过后才写入批次数据并生成 collect 流水。确认后令牌自动失效。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `previewToken` | string | 是 | 预览时返回的令牌 |
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/imports/confirm \
+  -H "Content-Type: application/json" \
+  -d '{
+    "previewToken": "IMP-1718888888888-abc123"
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "imported": 1,
+  "totalRows": 5,
+  "importableCount": 1,
+  "invalidCount": 4,
+  "batches": [
+    {
+      "id": "RS-011",
+      "species": "珙桐",
+      "quantity": 1500,
+      "container": "C-冷盒-16",
+      "section": "B1",
+      "viability": "unknown"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "TX-1718890000000-ab12",
+      "type": "collect",
+      "quantity": 1500,
+      "balance": 1500
+    }
+  ]
+}
+```
+
+### 防重复写入机制
+
+确认导入时会进行以下校验，防止预览后数据变化导致重复写入：
+
+1. **指纹校验**：预览时记录当前数据库指纹，确认时重新计算指纹。若不一致（说明有人在此期间新增/删除/修改了批次），拒绝导入并返回 `data_changed_since_preview` 错误
+2. **批次号二次校验**：即使指纹一致，仍会逐条检查导入行中的批次号是否在确认时已被占用
+3. **令牌一次性**：确认成功后令牌立即失效，不可重复使用
+4. **令牌过期**：令牌 30 分钟有效期，超时需重新预览
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `invalid_input` | 400 | 请求体无效（非空数组） |
+| `too_many_rows` | 400 | 单次导入超过1000条 |
+| `invalid_token` | 400 | 令牌格式无效 |
+| `token_not_found` | 404 | 预览令牌不存在 |
+| `token_expired` | 410 | 预览令牌已过期 |
+| `data_changed_since_preview` | 409 | 预览后数据已变化 |
+| `no_importable_rows` | 409 | 无可导入行 |
