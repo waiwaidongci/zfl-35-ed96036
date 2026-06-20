@@ -1,10 +1,20 @@
 import * as store from "../lib/reservation-store.js";
+import { getRequestContext } from "../lib/data-store.js";
+
+function makeCtx(req, body) {
+  const headers = (req && req.headers) || {};
+  const operator = (body && body.operator) || headers["x-operator"] || headers["x-user"] || undefined;
+  return {
+    operator,
+    source: getRequestContext(req)
+  };
+}
 
 const routes = [
   {
     method: "POST",
     pattern: /^\/batches\/([^/]+)\/reservations$/,
-    handler: async (_req, _res, body, params) => store.createReservation(params[1], body)
+    handler: async (req, _res, body, params) => store.createReservation(params[1], body, makeCtx(req, body))
   },
   {
     method: "GET",
@@ -18,22 +28,22 @@ const routes = [
   {
     method: "PATCH",
     pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/approve$/,
-    handler: async (_req, _res, _body, params) => store.approveReservation(params[1], params[2])
+    handler: async (req, _res, body, params) => store.approveReservation(params[1], params[2], makeCtx(req, body))
   },
   {
     method: "PATCH",
     pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/reject$/,
-    handler: async (_req, _res, _body, params) => store.rejectReservation(params[1], params[2])
+    handler: async (req, _res, body, params) => store.rejectReservation(params[1], params[2], makeCtx(req, body))
   },
   {
     method: "PATCH",
     pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/cancel$/,
-    handler: async (_req, _res, _body, params) => store.cancelReservation(params[1], params[2])
+    handler: async (req, _res, body, params) => store.cancelReservation(params[1], params[2], makeCtx(req, body))
   },
   {
     method: "POST",
     pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/fulfill$/,
-    handler: async (_req, _res, _body, params) => store.fulfillReservation(params[1], params[2])
+    handler: async (req, _res, body, params) => store.fulfillReservation(params[1], params[2], makeCtx(req, body))
   }
 ];
 

@@ -1,6 +1,4 @@
 import http from "node:http";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleLocationRoutes } from "./routes/locations.js";
@@ -9,254 +7,22 @@ import { handleReservationRoutes } from "./routes/reservations.js";
 import { handleAnomalyRoutes } from "./routes/anomalies.js";
 import { handleViabilityRoutes } from "./routes/viability.js";
 import { handleImportRoutes } from "./routes/imports.js";
+import { handleAuditRoutes } from "./routes/audit.js";
 import { getInventoryWithFrozen } from "./lib/reservation-store.js";
 import { scanAndDetectAnomalies } from "./lib/temperature-anomaly.js";
 import { splitBatch, mergeBatches, ensureLineageFields } from "./lib/batch-lineage.js";
 import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability } from "./lib/viability-trend.js";
+import {
+  loadDb,
+  mutate,
+  OPERATION,
+  clone,
+  getRequestContext
+} from "./lib/data-store.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = join(__dirname, "data", "rare-seeds.json");
 const port = Number(process.env.PORT || 3035);
 
-const seed = {
-  batches: [
-    {
-      id: "RS-001",
-      species: "独叶草",
-      collectionPlace: "西岭北坡",
-      motherPlant: "MP-17",
-      container: "C-冷盒-08",
-      section: "A2",
-      viability: "high",
-      quantity: 1800,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18.4 },
-        { at: "2026-06-02T08:00:00.000Z", value: -17.2 },
-        { at: "2026-06-03T08:00:00.000Z", value: -12.5 },
-        { at: "2026-06-04T08:00:00.000Z", value: -19.1 },
-        { at: "2026-06-05T08:00:00.000Z", value: -8.3 }
-      ],
-      transactions: [
-        { id: "TX-1", at: "2026-05-20", type: "collect", quantity: 1800, balance: 1800, note: "采集入库" }
-      ],
-      germinations: [
-        { at: "2026-01-15", sampled: 100, sprouted: 85, rate: 0.85 },
-        { at: "2026-03-15", sampled: 100, sprouted: 82, rate: 0.82 },
-        { at: "2026-05-15", sampled: 100, sprouted: 78, rate: 0.78 },
-        { at: "2026-06-12", sampled: 100, sprouted: 72, rate: 0.72 }
-      ],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "初始入库批次，待质量复核",
-      reviews: [
-        { id: "RV-1", at: "2026-05-25T10:30:00.000Z", reviewer: "李管理员", conclusion: "pending", note: "初步检查种子外观完整，等待萌发实验结果后最终确认" }
-      ],
-      anomalies: []
-    },
-    {
-      id: "RS-002",
-      species: "珙桐",
-      collectionPlace: "峨眉山",
-      motherPlant: "MP-23",
-      container: "C-冷盒-09",
-      section: "A2",
-      viability: "medium",
-      quantity: 950,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18.2 },
-        { at: "2026-06-02T08:00:00.000Z", value: -18 },
-        { at: "2026-06-03T08:00:00.000Z", value: -18.5 },
-        { at: "2026-06-04T08:00:00.000Z", value: -18.1 },
-        { at: "2026-06-05T08:00:00.000Z", value: -18.3 }
-      ],
-      transactions: [
-        { id: "TX-2", at: "2026-04-10", type: "collect", quantity: 1000, balance: 1000, note: "采集入库" },
-        { id: "TX-3", at: "2026-05-20", type: "sample", quantity: 50, balance: 950, note: "萌发实验取样" }
-      ],
-      germinations: [
-        { at: "2026-02-10", sampled: 100, sprouted: 78, rate: 0.78 },
-        { at: "2026-04-10", sampled: 100, sprouted: 71, rate: 0.71 },
-        { at: "2026-05-20", sampled: 100, sprouted: 55, rate: 0.55 }
-      ],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "珙桐种子，注意观察活性变化趋势",
-      reviews: [
-        { id: "RV-2", at: "2026-04-15T09:00:00.000Z", reviewer: "王主任", conclusion: "approved", note: "种子质量良好，入库保存" }
-      ],
-      anomalies: []
-    },
-    {
-      id: "RS-003",
-      species: "红豆杉",
-      collectionPlace: "神农架",
-      motherPlant: "MP-45",
-      container: "C-冷盒-10",
-      section: "A3",
-      viability: "high",
-      quantity: 2200,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18 },
-        { at: "2026-06-02T08:00:00.000Z", value: -17.9 },
-        { at: "2026-06-03T08:00:00.000Z", value: -18.1 },
-        { at: "2026-06-04T08:00:00.000Z", value: -18.2 },
-        { at: "2026-06-05T08:00:00.000Z", value: -18 }
-      ],
-      transactions: [
-        { id: "TX-4", at: "2026-02-01", type: "collect", quantity: 2200, balance: 2200, note: "采集入库" }
-      ],
-      germinations: [
-        { at: "2026-02-05", sampled: 100, sprouted: 92, rate: 0.92 },
-        { at: "2026-04-05", sampled: 100, sprouted: 90, rate: 0.9 },
-        { at: "2026-06-05", sampled: 100, sprouted: 89, rate: 0.89 }
-      ],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "红豆杉种子，活性很高，定期复测",
-      reviews: [
-        { id: "RV-3", at: "2026-02-10T14:00:00.000Z", reviewer: "张研究员", conclusion: "approved", note: "高品质种子，活性92%，符合标准" }
-      ],
-      anomalies: []
-    },
-    {
-      id: "RS-004",
-      species: "望天树",
-      collectionPlace: "西双版纳",
-      motherPlant: "MP-61",
-      container: "C-冷盒-11",
-      section: "A3",
-      viability: "low",
-      quantity: 600,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18.5 },
-        { at: "2026-06-02T08:00:00.000Z", value: -18.3 },
-        { at: "2026-06-03T08:00:00.000Z", value: -18.4 },
-        { at: "2026-06-04T08:00:00.000Z", value: -18.6 },
-        { at: "2026-06-05T08:00:00.000Z", value: -18.2 }
-      ],
-      transactions: [
-        { id: "TX-5", at: "2026-01-15", type: "collect", quantity: 600, balance: 600, note: "采集入库" }
-      ],
-      germinations: [
-        { at: "2026-01-20", sampled: 100, sprouted: 52, rate: 0.52 }
-      ],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "望天树种子，初始萌发率偏低，需要重点关注",
-      reviews: [
-        { id: "RV-4", at: "2026-01-25T11:00:00.000Z", reviewer: "李管理员", conclusion: "pending", note: "萌发率52%，低于阈值，建议尽快复测" }
-      ],
-      anomalies: []
-    },
-    {
-      id: "RS-005",
-      species: "水杉",
-      collectionPlace: "湖北利川",
-      motherPlant: "MP-33",
-      container: "C-冷盒-12",
-      section: "A1",
-      viability: "high",
-      quantity: 1500,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18.1 },
-        { at: "2026-06-02T08:00:00.000Z", value: -18 },
-        { at: "2026-06-03T08:00:00.000Z", value: -17.8 },
-        { at: "2026-06-04T08:00:00.000Z", value: -18.2 },
-        { at: "2026-06-05T08:00:00.000Z", value: -18.1 }
-      ],
-      transactions: [
-        { id: "TX-6", at: "2026-02-10", type: "collect", quantity: 1500, balance: 1500, note: "采集入库" }
-      ],
-      germinations: [
-        { at: "2026-02-15", sampled: 100, sprouted: 88, rate: 0.88 }
-      ],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "水杉种子，已超过90天未复测",
-      reviews: [
-        { id: "RV-5", at: "2026-02-20T10:00:00.000Z", reviewer: "王主任", conclusion: "approved", note: "初始活性良好，建议3个月后复测" }
-      ],
-      anomalies: []
-    },
-    {
-      id: "RS-006",
-      species: "银杏",
-      collectionPlace: "天目山",
-      motherPlant: "MP-77",
-      container: "C-冷盒-13",
-      section: "A1",
-      viability: "medium",
-      quantity: 800,
-      status: "active",
-      lineage: {
-        splitFrom: null,
-        splitTo: [],
-        mergedFrom: [],
-        mergedInto: null
-      },
-      temperatures: [
-        { at: "2026-06-01T08:00:00.000Z", value: -18.3 },
-        { at: "2026-06-02T08:00:00.000Z", value: -18.2 },
-        { at: "2026-06-03T08:00:00.000Z", value: -18.4 },
-        { at: "2026-06-04T08:00:00.000Z", value: -18.1 },
-        { at: "2026-06-05T08:00:00.000Z", value: -18.3 }
-      ],
-      transactions: [
-        { id: "TX-7", at: "2026-03-05", type: "collect", quantity: 800, balance: 800, note: "采集入库" }
-      ],
-      germinations: [],
-      frozenQuantity: 0,
-      reservations: [],
-      remark: "银杏种子，尚未进行萌发实验",
-      reviews: [],
-      anomalies: []
-    }
-  ]
-};
-
-async function loadDb() {
-  if (!existsSync(dbPath)) {
-    await mkdir(dirname(dbPath), { recursive: true });
-    await writeFile(dbPath, JSON.stringify(seed, null, 2));
-  }
-  return JSON.parse(await readFile(dbPath, "utf8"));
-}
-async function saveDb(db) { await writeFile(dbPath, JSON.stringify(db, null, 2)); }
 async function body(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
@@ -266,6 +32,20 @@ function send(res, status, data) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(data, null, 2));
 }
+
+function extractOperator(req, input) {
+  if (input && input.operator) return input.operator;
+  const headers = (req && req.headers) || {};
+  return headers["x-operator"] || headers["x-user"] || undefined;
+}
+
+function makeCtx(req, input) {
+  return {
+    operator: extractOperator(req, input),
+    source: getRequestContext(req)
+  };
+}
+
 function applyTransaction(batch, input) {
   ensureLineageFields(batch);
   const qty = Number(input.quantity || 0);
@@ -301,12 +81,15 @@ const server = http.createServer(async (req, res) => {
     const importHandled = await handleImportRoutes(req, res, send, body);
     if (importHandled) return;
 
+    const auditHandled = await handleAuditRoutes(req, res, send, body);
+    if (auditHandled) return;
+
     const db = await loadDb();
-    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "POST /batches/:id/split", "POST /batches/merge", "GET /anomalies/pending", "GET /batches/:id/anomalies?status=", "PATCH /batches/:id/anomalies/:anomalyId/handle", "POST /anomalies/scan?batchId=&threshold=", "GET /reports/inventory", "GET /reports/viability-risk?lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=", "GET /batches/:id/viability", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch", "POST /imports/preview", "POST /imports/confirm"] });
+    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "POST /batches/:id/split", "POST /batches/merge", "GET /anomalies/pending", "GET /batches/:id/anomalies?status=", "PATCH /batches/:id/anomalies/:anomalyId/handle", "POST /anomalies/scan?batchId=&threshold=", "GET /reports/inventory", "GET /reports/viability-risk?lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=", "GET /batches/:id/viability", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch", "POST /imports/preview", "POST /imports/confirm", "GET /audit-logs", "GET /audit-logs/stats", "GET /batches/:id/history/timeline", "GET /batches/:id/history/replay"] });
 
     if (req.method === "POST" && url.pathname === "/batches/merge") {
       const input = await body(req);
-      const result = await mergeBatches(input.batchIds, input.target);
+      const result = await mergeBatches(input.batchIds, input.target, makeCtx(req, input));
       if (result.error) {
         const statusCode = result.error === "batch_not_found" ? 404 : 409;
         return send(res, statusCode, result);
@@ -339,38 +122,61 @@ const server = http.createServer(async (req, res) => {
       }
       return send(res, 200, rows);
     }
+
     if (req.method === "POST" && url.pathname === "/batches") {
       const input = await body(req);
-      const batch = {
-        id: input.id || `RS-${Date.now()}`,
-        species: input.species,
-        collectionPlace: input.collectionPlace,
-        motherPlant: input.motherPlant,
-        container: input.container,
-        section: input.section,
-        viability: input.viability || "unknown",
-        quantity: Number(input.quantity || 0),
-        status: "active",
-        lineage: {
-          splitFrom: null,
-          splitTo: [],
-          mergedFrom: [],
-          mergedInto: null
-        },
-        temperatures: [],
-        transactions: [],
-        germinations: [],
-        frozenQuantity: 0,
-        reservations: [],
-        remark: input.remark || "",
-        reviews: [],
-        anomalies: []
-      };
-      batch.transactions.push({ id: `TX-${Date.now()}`, at: new Date().toISOString(), type: "collect", quantity: batch.quantity, balance: batch.quantity, note: "新批次入库" });
-      db.batches.push(batch);
-      await saveDb(db);
-      return send(res, 201, batch);
+      const ctx = makeCtx(req, input);
+
+      const result = await mutate({
+        operation: OPERATION.BATCH_CREATE,
+        entityType: "batch",
+        entityId: input.id || null,
+        operator: ctx.operator,
+        source: ctx.source,
+        affectedBatchIds: [],
+        details: {},
+        mutator: (dbInner) => {
+          const batch = {
+            id: input.id || `RS-${Date.now()}`,
+            species: input.species,
+            collectionPlace: input.collectionPlace,
+            motherPlant: input.motherPlant,
+            container: input.container,
+            section: input.section,
+            viability: input.viability || "unknown",
+            quantity: Number(input.quantity || 0),
+            status: "active",
+            lineage: {
+              splitFrom: null,
+              splitTo: [],
+              mergedFrom: [],
+              mergedInto: null
+            },
+            temperatures: [],
+            transactions: [],
+            germinations: [],
+            frozenQuantity: 0,
+            reservations: [],
+            remark: input.remark || "",
+            reviews: [],
+            anomalies: []
+          };
+          batch.transactions.push({ id: `TX-${Date.now()}`, at: new Date().toISOString(), type: "collect", quantity: batch.quantity, balance: batch.quantity, note: "新批次入库" });
+          dbInner.batches.push(batch);
+
+          return {
+            createdBatchIds: [batch.id],
+            details: {
+              batch: clone(batch)
+            },
+            batch
+          };
+        }
+      });
+
+      return send(res, 201, result.batch || result);
     }
+
     const match = url.pathname.match(/^\/batches\/([^/]+)(?:\/([^/]+))?$/);
     if (match) {
       const batch = db.batches.find(b => b.id === match[1]);
@@ -380,7 +186,7 @@ const server = http.createServer(async (req, res) => {
 
       if (req.method === "POST" && action === "split") {
         const input = await body(req);
-        const result = await splitBatch(batch.id, input.items);
+        const result = await splitBatch(batch.id, input.items, makeCtx(req, input));
         if (result.error) {
           const statusCode = result.error === "batch_not_found" ? 404 : 409;
           return send(res, statusCode, result);
@@ -397,44 +203,145 @@ const server = http.createServer(async (req, res) => {
         batch.trendSummary = getBatchTrendSummary(batch);
         return send(res, 200, batch);
       }
+
       const input = await body(req);
+      const ctx = makeCtx(req, input);
+
       if (req.method === "POST" && action === "transactions") {
-        const result = applyTransaction(batch, input);
+        const result = await mutate({
+          operation: OPERATION.TRANSACTION_ADD,
+          entityType: "batch",
+          entityId: batch.id,
+          operator: ctx.operator,
+          source: ctx.source,
+          affectedBatchIds: [batch.id],
+          details: {},
+          mutator: (dbInner) => {
+            const b = dbInner.batches.find(x => x.id === batch.id);
+            const r = applyTransaction(b, input);
+            if (r.error) return r;
+            return {
+              details: {
+                transaction: clone(r.tx),
+                quantityAfter: b.quantity
+              },
+              batchId: b.id,
+              transaction: r.tx,
+              quantity: b.quantity
+            };
+          }
+        });
         if (result.error) return send(res, 409, result);
-        await saveDb(db);
-        return send(res, 201, { batchId: batch.id, transaction: result.tx, quantity: batch.quantity });
+        return send(res, 201, result);
       }
+
       if (req.method === "POST" && action === "temperatures") {
-        batch.temperatures.push({ at: input.at || new Date().toISOString(), value: Number(input.value) });
-        await saveDb(db);
+        const tempRecord = { at: input.at || new Date().toISOString(), value: Number(input.value) };
+        const result = await mutate({
+          operation: OPERATION.TEMPERATURE_ADD,
+          entityType: "batch",
+          entityId: batch.id,
+          operator: ctx.operator,
+          source: ctx.source,
+          affectedBatchIds: [batch.id],
+          details: {},
+          mutator: (dbInner) => {
+            const b = dbInner.batches.find(x => x.id === batch.id);
+            b.temperatures.push(tempRecord);
+            return {
+              details: {
+                temperature: clone(tempRecord)
+              },
+              batchId: b.id,
+              temperature: tempRecord
+            };
+          }
+        });
+
         const scanResult = await scanAndDetectAnomalies(batch.id);
         return send(res, 201, {
           batch,
+          temperature: tempRecord,
           anomaliesDetected: scanResult.detected || 0,
           newAnomalies: scanResult.anomalies || []
         });
       }
+
       if (req.method === "POST" && action === "germinations") {
         const sampled = Number(input.sampled || 0);
         const sprouted = Number(input.sprouted || 0);
-        batch.germinations.push({ at: input.at || new Date().toISOString().slice(0,10), sampled, sprouted, rate: sampled ? Number((sprouted / sampled).toFixed(3)) : 0 });
-        if (sampled) {
-          const result = applyTransaction(batch, { type: "sample", quantity: sampled, note: "萌发实验取样" });
-          if (result.error) return send(res, 409, result);
-        }
-        await saveDb(db);
-        return send(res, 201, batch);
+        const germination = {
+          at: input.at || new Date().toISOString().slice(0, 10),
+          sampled,
+          sprouted,
+          rate: sampled ? Number((sprouted / sampled).toFixed(3)) : 0
+        };
+
+        const result = await mutate({
+          operation: OPERATION.GERMINATION_ADD,
+          entityType: "batch",
+          entityId: batch.id,
+          operator: ctx.operator,
+          source: ctx.source,
+          affectedBatchIds: [batch.id],
+          details: {},
+          mutator: (dbInner) => {
+            const b = dbInner.batches.find(x => x.id === batch.id);
+            b.germinations.push(germination);
+            let txRecord = null;
+            if (sampled) {
+              const r = applyTransaction(b, { type: "sample", quantity: sampled, note: "萌发实验取样" });
+              if (r.error) return r;
+              txRecord = r.tx;
+            }
+            return {
+              details: {
+                germination: clone(germination),
+                transaction: txRecord ? clone(txRecord) : null,
+                quantityAfter: b.quantity
+              },
+              batchId: b.id,
+              batch: b,
+              germination,
+              transaction: txRecord
+            };
+          }
+        });
+
+        if (result.error) return send(res, 409, result);
+        return send(res, 201, result.batch || result);
       }
+
       if (req.method === "PATCH" && action === "remark") {
-        batch.remark = input.remark || "";
-        await saveDb(db);
-        return send(res, 200, { batchId: batch.id, remark: batch.remark });
+        const newRemark = input.remark || "";
+        const result = await mutate({
+          operation: OPERATION.BATCH_UPDATE_REMARK,
+          entityType: "batch",
+          entityId: batch.id,
+          operator: ctx.operator,
+          source: ctx.source,
+          affectedBatchIds: [batch.id],
+          details: {},
+          mutator: (dbInner) => {
+            const b = dbInner.batches.find(x => x.id === batch.id);
+            b.remark = newRemark;
+            return {
+              details: {
+                remark: newRemark
+              },
+              batchId: b.id,
+              remark: b.remark
+            };
+          }
+        });
+        return send(res, 200, result);
       }
+
       if (req.method === "GET" && action === "reviews") {
         return send(res, 200, batch.reviews || []);
       }
+
       if (req.method === "POST" && action === "reviews") {
-        if (!batch.reviews) batch.reviews = [];
         const validConclusions = ["pending", "approved", "rejected"];
         const conclusion = validConclusions.includes(input.conclusion) ? input.conclusion : "pending";
         const review = {
@@ -444,11 +351,32 @@ const server = http.createServer(async (req, res) => {
           conclusion,
           note: input.note || ""
         };
-        batch.reviews.push(review);
-        await saveDb(db);
-        return send(res, 201, { batchId: batch.id, review });
+
+        const result = await mutate({
+          operation: OPERATION.REVIEW_ADD,
+          entityType: "batch",
+          entityId: batch.id,
+          operator: review.reviewer !== "未知管理员" ? review.reviewer : ctx.operator,
+          source: ctx.source,
+          affectedBatchIds: [batch.id],
+          details: {},
+          mutator: (dbInner) => {
+            const b = dbInner.batches.find(x => x.id === batch.id);
+            if (!b.reviews) b.reviews = [];
+            b.reviews.push(review);
+            return {
+              details: {
+                review: clone(review)
+              },
+              batchId: b.id,
+              review
+            };
+          }
+        });
+        return send(res, 201, result);
       }
     }
+
     if (req.method === "GET" && url.pathname === "/reports/inventory") {
       const report = await getInventoryWithFrozen();
       return send(res, 200, report);

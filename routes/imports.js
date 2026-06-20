@@ -1,4 +1,14 @@
 import * as store from "../lib/import-store.js";
+import { getRequestContext } from "../lib/data-store.js";
+
+function makeCtx(req, body) {
+  const headers = (req && req.headers) || {};
+  const operator = (body && body.operator) || headers["x-operator"] || headers["x-user"] || undefined;
+  return {
+    operator,
+    source: getRequestContext(req)
+  };
+}
 
 const routes = [
   {
@@ -9,7 +19,7 @@ const routes = [
   {
     method: "POST",
     pattern: /^\/imports\/confirm$/,
-    handler: async (_req, _res, body) => store.confirmImport(body.previewToken, body)
+    handler: async (req, _res, body) => store.confirmImport(body.previewToken, body, makeCtx(req, body))
   }
 ];
 

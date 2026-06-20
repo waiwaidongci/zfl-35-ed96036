@@ -1,4 +1,14 @@
 import * as anomalyStore from "../lib/temperature-anomaly.js";
+import { getRequestContext } from "../lib/data-store.js";
+
+function makeCtx(req, body) {
+  const headers = (req && req.headers) || {};
+  const operator = (body && body.operator) || headers["x-operator"] || headers["x-user"] || undefined;
+  return {
+    operator,
+    source: getRequestContext(req)
+  };
+}
 
 const routes = [
   {
@@ -18,8 +28,8 @@ const routes = [
   {
     method: "PATCH",
     pattern: /^\/batches\/([^/]+)\/anomalies\/([^/]+)\/handle$/,
-    handler: async (_req, _res, body, params) =>
-      anomalyStore.handleAnomaly(params[1], params[2], body)
+    handler: async (req, _res, body, params) =>
+      anomalyStore.handleAnomaly(params[1], params[2], body, makeCtx(req, body))
   },
   {
     method: "POST",
@@ -32,7 +42,7 @@ const routes = [
         : body.threshold
           ? Number(body.threshold)
           : undefined;
-      return anomalyStore.scanAndDetectAnomalies(batchId, threshold);
+      return anomalyStore.scanAndDetectAnomalies(batchId, threshold, makeCtx(req, body));
     }
   }
 ];
