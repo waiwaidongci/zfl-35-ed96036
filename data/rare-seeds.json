@@ -8,7 +8,7 @@
       "container": "C-冷盒-08",
       "section": "A2",
       "viability": "high",
-      "quantity": 1600,
+      "quantity": 1800,
       "temperatures": [
         {
           "at": "2026-06-01T08:00:00.000Z",
@@ -23,14 +23,6 @@
           "quantity": 1800,
           "balance": 1800,
           "note": "采集入库"
-        },
-        {
-          "id": "TX-1781948241511",
-          "at": "2026-06-20T09:37:21.511Z",
-          "type": "sample",
-          "quantity": 200,
-          "balance": 1600,
-          "note": "取样预约 RES-1781948227396 转实际取样，申请人：张研究员，用途：基因多样性分析"
         }
       ],
       "germinations": [
@@ -42,59 +34,7 @@
         }
       ],
       "frozenQuantity": 0,
-      "reservations": [
-        {
-          "id": "RES-1781948227396",
-          "applicant": "张研究员",
-          "purpose": "基因多样性分析",
-          "quantity": 200,
-          "plannedDate": "2026-07-01",
-          "status": "fulfilled",
-          "createdAt": "2026-06-20T09:37:07.396Z",
-          "updatedAt": "2026-06-20T09:37:21.511Z",
-          "fulfilledAt": "2026-06-20T09:37:21.511Z"
-        },
-        {
-          "id": "RES-1781948251196",
-          "applicant": "李教授",
-          "purpose": "教学演示",
-          "quantity": 50,
-          "plannedDate": "2026-08-01",
-          "status": "rejected",
-          "createdAt": "2026-06-20T09:37:31.196Z",
-          "updatedAt": "2026-06-20T09:37:31.270Z"
-        },
-        {
-          "id": "RES-1781948268964",
-          "applicant": "王博士",
-          "purpose": "保存实验",
-          "quantity": 100,
-          "plannedDate": "2026-09-01",
-          "status": "cancelled",
-          "createdAt": "2026-06-20T09:37:48.964Z",
-          "updatedAt": "2026-06-20T09:37:49.028Z"
-        },
-        {
-          "id": "RES-1781948280991",
-          "applicant": "测试",
-          "purpose": "超量",
-          "quantity": 99999,
-          "plannedDate": "2026-10-01",
-          "status": "pending",
-          "createdAt": "2026-06-20T09:38:00.991Z",
-          "updatedAt": "2026-06-20T09:38:00.991Z"
-        },
-        {
-          "id": "RES-1781948289271",
-          "applicant": "测试",
-          "purpose": "超量",
-          "quantity": 99999,
-          "plannedDate": "2026-10-01",
-          "status": "pending",
-          "createdAt": "2026-06-20T09:38:09.271Z",
-          "updatedAt": "2026-06-20T09:38:09.271Z"
-        }
-      ],
+      "reservations": [],
       "remark": "初始入库批次，待质量复核",
       "reviews": [
         {
