@@ -25,7 +25,11 @@ const seed = {
       transactions: [
         { id: "TX-1", at: "2026-05-20", type: "collect", quantity: 1800, balance: 1800, note: "采集入库" }
       ],
-      germinations: [{ at: "2026-06-12", sampled: 100, sprouted: 72, rate: 0.72 }]
+      germinations: [{ at: "2026-06-12", sampled: 100, sprouted: 72, rate: 0.72 }],
+      remark: "初始入库批次，待质量复核",
+      reviews: [
+        { id: "RV-1", at: "2026-05-25T10:30:00.000Z", reviewer: "李管理员", conclusion: "pending", note: "初步检查种子外观完整，等待萌发实验结果后最终确认" }
+      ]
     }
   ]
 };
@@ -70,18 +74,24 @@ const server = http.createServer(async (req, res) => {
     if (labelHandled) return;
 
     const db = await loadDb();
-    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=", "POST /batches", "GET /batches/:id", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "GET /reports/inventory", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
+    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "GET /reports/inventory", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
     if (req.method === "GET" && url.pathname === "/batches") {
       let rows = db.batches;
       for (const key of ["species", "collectionPlace", "section", "viability"]) {
         const value = url.searchParams.get(key);
         if (value) rows = rows.filter(batch => String(batch[key]).includes(value));
       }
+      const hasPendingReview = url.searchParams.get("hasPendingReview");
+      if (hasPendingReview === "true") {
+        rows = rows.filter(batch => (batch.reviews || []).some(r => r.conclusion === "pending"));
+      } else if (hasPendingReview === "false") {
+        rows = rows.filter(batch => !(batch.reviews || []).some(r => r.conclusion === "pending"));
+      }
       return send(res, 200, rows);
     }
     if (req.method === "POST" && url.pathname === "/batches") {
       const input = await body(req);
-      const batch = { id: input.id || `RS-${Date.now()}`, species: input.species, collectionPlace: input.collectionPlace, motherPlant: input.motherPlant, container: input.container, section: input.section, viability: input.viability || "unknown", quantity: Number(input.quantity || 0), temperatures: [], transactions: [], germinations: [] };
+      const batch = { id: input.id || `RS-${Date.now()}`, species: input.species, collectionPlace: input.collectionPlace, motherPlant: input.motherPlant, container: input.container, section: input.section, viability: input.viability || "unknown", quantity: Number(input.quantity || 0), temperatures: [], transactions: [], germinations: [], remark: input.remark || "", reviews: [] };
       batch.transactions.push({ id: `TX-${Date.now()}`, at: new Date().toISOString(), type: "collect", quantity: batch.quantity, balance: batch.quantity, note: "新批次入库" });
       db.batches.push(batch);
       await saveDb(db);
@@ -92,7 +102,11 @@ const server = http.createServer(async (req, res) => {
       const batch = db.batches.find(b => b.id === match[1]);
       if (!batch) return send(res, 404, { error: "batch_not_found" });
       const action = match[2];
-      if (req.method === "GET" && !action) return send(res, 200, batch);
+      if (req.method === "GET" && !action) {
+        if (!batch.reviews) batch.reviews = [];
+        if (batch.remark === undefined) batch.remark = "";
+        return send(res, 200, batch);
+      }
       const input = await body(req);
       if (req.method === "POST" && action === "transactions") {
         const result = applyTransaction(batch, input);
@@ -115,6 +129,29 @@ const server = http.createServer(async (req, res) => {
         }
         await saveDb(db);
         return send(res, 201, batch);
+      }
+      if (req.method === "PATCH" && action === "remark") {
+        batch.remark = input.remark || "";
+        await saveDb(db);
+        return send(res, 200, { batchId: batch.id, remark: batch.remark });
+      }
+      if (req.method === "GET" && action === "reviews") {
+        return send(res, 200, batch.reviews || []);
+      }
+      if (req.method === "POST" && action === "reviews") {
+        if (!batch.reviews) batch.reviews = [];
+        const validConclusions = ["pending", "approved", "rejected"];
+        const conclusion = validConclusions.includes(input.conclusion) ? input.conclusion : "pending";
+        const review = {
+          id: `RV-${Date.now()}`,
+          at: input.at || new Date().toISOString(),
+          reviewer: input.reviewer || "未知管理员",
+          conclusion,
+          note: input.note || ""
+        };
+        batch.reviews.push(review);
+        await saveDb(db);
+        return send(res, 201, { batchId: batch.id, review });
       }
     }
     if (req.method === "GET" && url.pathname === "/reports/inventory") {

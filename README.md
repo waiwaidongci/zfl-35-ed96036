@@ -6,7 +6,171 @@
 npm start
 ```
 
-默认端口`3035`。支持批次、温度、取样、萌发实验、库存流水和负库存拦截。
+默认端口`3035`。支持批次、温度、取样、萌发实验、库存流水、负库存拦截、批次备注和人工复核。
+
+## 批次备注与人工复核模块
+
+支持管理员给批次追加复核记录，记录复核时间、复核人、结论和备注。批次详情接口一并返回复核历史，列表接口支持按是否存在待复核结论筛选。
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| PATCH | `/batches/:id/remark` | 更新批次备注 |
+| GET | `/batches/:id/reviews` | 获取批次复核历史记录 |
+| POST | `/batches/:id/reviews` | 新增复核记录 |
+| GET | `/batches?hasPendingReview=true/false` | 按是否存在待复核结论筛选批次列表 |
+
+### 数据结构
+
+#### 批次字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `remark` | string | 批次备注 |
+| `reviews` | array | 复核记录列表 |
+
+#### 复核记录字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 复核记录ID |
+| `at` | string | 复核时间（ISO格式） |
+| `reviewer` | string | 复核人 |
+| `conclusion` | string | 复核结论：`pending`（待复核）、`approved`（通过）、`rejected`（驳回） |
+| `note` | string | 复核备注 |
+
+### 接口详情
+
+#### PATCH `/batches/:id/remark` — 更新批次备注
+
+**请求体：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `remark` | string | 批次备注内容 |
+
+**请求示例：**
+
+```bash
+curl -X PATCH http://localhost:3035/batches/RS-001/remark \
+  -H "Content-Type: application/json" \
+  -d '{ "remark": "高品质种子，需重点关注" }'
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "remark": "高品质种子，需重点关注"
+}
+```
+
+#### GET `/batches/:id/reviews` — 获取复核历史
+
+获取指定批次的所有复核记录，按时间从早到晚排序。
+
+**请求示例：**
+
+```bash
+curl http://localhost:3035/batches/RS-001/reviews
+```
+
+**响应示例：**
+
+```json
+[
+  {
+    "id": "RV-1",
+    "at": "2026-05-25T10:30:00.000Z",
+    "reviewer": "李管理员",
+    "conclusion": "pending",
+    "note": "初步检查种子外观完整，等待萌发实验结果后最终确认"
+  }
+]
+```
+
+#### POST `/batches/:id/reviews` — 新增复核记录
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `reviewer` | string | 否 | 复核人，默认"未知管理员" |
+| `conclusion` | string | 否 | 复核结论：`pending`/`approved`/`rejected`，默认`pending` |
+| `note` | string | 否 | 复核备注 |
+| `at` | string | 否 | 复核时间，默认当前时间 |
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/RS-001/reviews \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reviewer": "王主任",
+    "conclusion": "approved",
+    "note": "萌发率72%，符合入库标准，通过复核"
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "review": {
+    "id": "RV-1718888888888",
+    "at": "2026-06-20T10:00:00.000Z",
+    "reviewer": "王主任",
+    "conclusion": "approved",
+    "note": "萌发率72%，符合入库标准，通过复核"
+  }
+}
+```
+
+#### GET `/batches?hasPendingReview=true` — 按待复核筛选
+
+- `hasPendingReview=true`：筛选出存在待复核结论的批次
+- `hasPendingReview=false`：筛选出没有待复核结论的批次
+- 不传该参数：不筛选，返回所有批次
+
+**请求示例：**
+
+```bash
+# 仅显示有待复核结论的批次
+curl "http://localhost:3035/batches?hasPendingReview=true"
+```
+
+#### GET `/batches/:id` — 批次详情（含复核历史）
+
+批次详情接口已包含 `remark` 和 `reviews` 字段，一并返回复核历史。
+
+**响应示例（节选）：**
+
+```json
+{
+  "id": "RS-001",
+  "species": "独叶草",
+  "remark": "初始入库批次，待质量复核",
+  "reviews": [
+    {
+      "id": "RV-1",
+      "at": "2026-05-25T10:30:00.000Z",
+      "reviewer": "李管理员",
+      "conclusion": "pending",
+      "note": "初步检查种子外观完整，等待萌发实验结果后最终确认"
+    }
+  ],
+  ...
+}
+```
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `batch_not_found` | 404 | 批次不存在 |
 
 ## 库位管理模块
 
