@@ -7,9 +7,11 @@ import { handleLocationRoutes } from "./routes/locations.js";
 import { handleLabelRoutes } from "./routes/labels.js";
 import { handleReservationRoutes } from "./routes/reservations.js";
 import { handleAnomalyRoutes } from "./routes/anomalies.js";
+import { handleViabilityRoutes } from "./routes/viability.js";
 import { getInventoryWithFrozen } from "./lib/reservation-store.js";
 import { scanAndDetectAnomalies } from "./lib/temperature-anomaly.js";
 import { splitBatch, mergeBatches, ensureLineageFields } from "./lib/batch-lineage.js";
+import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability } from "./lib/viability-trend.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = join(__dirname, "data", "rare-seeds.json");
@@ -101,8 +103,11 @@ const server = http.createServer(async (req, res) => {
     const anomalyHandled = await handleAnomalyRoutes(req, res, send, body);
     if (anomalyHandled) return;
 
+    const viabilityHandled = await handleViabilityRoutes(req, res, send, body);
+    if (viabilityHandled) return;
+
     const db = await loadDb();
-    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=&status=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "POST /batches/:id/split", "POST /batches/merge", "GET /anomalies/pending", "GET /batches/:id/anomalies?status=", "PATCH /batches/:id/anomalies/:anomalyId/handle", "POST /anomalies/scan?batchId=&threshold=", "GET /reports/inventory", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
+    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "POST /batches/:id/split", "POST /batches/merge", "GET /anomalies/pending", "GET /batches/:id/anomalies?status=", "PATCH /batches/:id/anomalies/:anomalyId/handle", "POST /anomalies/scan?batchId=&threshold=", "GET /reports/inventory", "GET /reports/viability-risk?lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=", "GET /batches/:id/viability", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
 
     if (req.method === "POST" && url.pathname === "/batches/merge") {
       const input = await body(req);
@@ -126,7 +131,17 @@ const server = http.createServer(async (req, res) => {
       } else if (hasPendingReview === "false") {
         rows = rows.filter(batch => !(batch.reviews || []).some(r => r.conclusion === "pending"));
       }
-      for (const batch of rows) ensureLineageFields(batch);
+      const riskLevel = url.searchParams.get("riskLevel");
+      if (riskLevel) {
+        const validLevels = ["normal", "warning", "critical", "unknown"];
+        if (validLevels.includes(riskLevel)) {
+          rows = filterBatchesByRisk(rows, riskLevel);
+        }
+      }
+      for (const batch of rows) {
+        ensureLineageFields(batch);
+        batch.trendSummary = getBatchTrendSummary(batch);
+      }
       return send(res, 200, rows);
     }
     if (req.method === "POST" && url.pathname === "/batches") {
@@ -184,6 +199,7 @@ const server = http.createServer(async (req, res) => {
         if (!batch.reservations) batch.reservations = [];
         if (batch.frozenQuantity === undefined || batch.frozenQuantity === null) batch.frozenQuantity = 0;
         if (!batch.anomalies) batch.anomalies = [];
+        batch.trendSummary = getBatchTrendSummary(batch);
         return send(res, 200, batch);
       }
       const input = await body(req);

@@ -1311,3 +1311,333 @@ curl -X POST http://localhost:3035/batches/merge \
 | `batch_id_conflict` | 409 | 自定义批次ID已存在 |
 | `insufficient_batches` | 409 | 合并至少需要2个批次 |
 | `merge_mismatch` | 409 | 合并批次必须同物种、同采集地、同母株 |
+
+## 活性趋势分析模块
+
+根据每个批次的 `germinations` 历史记录，自动计算最近萌发率、趋势方向和风险等级。提供全局活性风险报告，列出连续下降、低于阈值和长期未复测的批次。批次列表支持按活性风险筛选，批次详情返回趋势摘要。
+
+### 核心概念
+
+#### 风险等级（riskLevel）
+
+| 等级 | 说明 | 判断条件 |
+|------|------|----------|
+| `normal` | 正常 | 无风险因素 |
+| `warning` | 警告 | 存在1个风险因素，或多个轻度风险因素 |
+| `critical` | 严重 | 萌发率下降趋势 + 低于阈值 |
+| `unknown` | 未知 | 无萌发实验数据 |
+
+#### 趋势方向（trendDirection）
+
+| 方向 | 说明 |
+|------|------|
+| `rising` | 上升 | 最近萌发率显著提升 |
+| `stable` | 稳定 | 无显著变化 |
+| `declining` | 下降 | 最近萌发率持续下降或总体下降 |
+| `unknown` | 未知 | 数据不足（少于2次记录） |
+
+#### 风险因素
+
+| 因素 | 说明 | 默认阈值 |
+|------|------|----------|
+| `rate_below_threshold` | 萌发率低于阈值 | 60%（0.6） |
+| `declining_trend` | 连续下降趋势 | 连续2次显著下降（变化≥5%） |
+| `long_term_no_retest` | 长期未复测 | 超过90天 |
+
+#### 可配置参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `lowRateThreshold` | 低萌发率阈值 | 0.6 |
+| `consecutiveDeclineThreshold` | 连续下降次数阈值 | 2 |
+| `longTermDays` | 长期未复测天数 | 90 |
+| `significantChangeThreshold` | 显著变化阈值 | 0.05（5%） |
+| `minRecordsForTrend` | 趋势分析最少记录数 | 2 |
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/reports/viability-risk?lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=&significantChangeThreshold=` | 全局活性风险报告 |
+| GET | `/batches/:id/viability` | 单个批次活性分析详情 |
+| GET | `/batches?riskLevel=normal/warning/critical/unknown` | 按风险等级筛选批次列表 |
+| GET | `/batches/:id` | 批次详情（含 `trendSummary` 趋势摘要） |
+
+### 数据结构
+
+#### 趋势摘要字段（trendSummary）
+
+批次列表和详情接口都会返回此字段：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `latestRate` | number | 最近萌发率（0-1） |
+| `latestRateFormatted` | string | 格式化的萌发率（如 "72.0%"） |
+| `trendDirection` | string | 趋势方向：`rising`/`stable`/`declining`/`unknown` |
+| `riskLevel` | string | 风险等级：`normal`/`warning`/`critical`/`unknown` |
+| `daysSinceLastTest` | number | 距最近一次测试的天数 |
+
+### 接口详情
+
+#### GET `/reports/viability-risk` — 全局活性风险报告
+
+获取所有批次的活性风险分析报告，包含三类重点关注批次清单。
+
+**查询参数（可选）：**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `lowRateThreshold` | number | 自定义低萌发率阈值（0-1） |
+| `consecutiveDeclineThreshold` | number | 自定义连续下降次数阈值 |
+| `longTermDays` | number | 自定义长期未复测天数 |
+| `significantChangeThreshold` | number | 自定义显著变化阈值 |
+
+**请求示例：**
+
+```bash
+# 使用默认阈值
+curl http://localhost:3035/reports/viability-risk
+
+# 自定义阈值
+curl "http://localhost:3035/reports/viability-risk?lowRateThreshold=0.7&longTermDays=60"
+```
+
+**响应示例：**
+
+```json
+{
+  "generatedAt": "2026-06-20T10:00:00.000Z",
+  "options": {
+    "lowRateThreshold": 0.6,
+    "consecutiveDeclineThreshold": 2,
+    "longTermDays": 90,
+    "significantChangeThreshold": 0.05
+  },
+  "summary": {
+    "totalBatches": 6,
+    "criticalCount": 1,
+    "warningCount": 3,
+    "normalCount": 1,
+    "unknownCount": 1
+  },
+  "continuouslyDeclining": [
+    {
+      "batchId": "RS-002",
+      "species": "珙桐",
+      "latestRate": 0.55,
+      "trendChange": -0.23,
+      "germinationCount": 3,
+      "germinationHistory": [
+        { "at": "2026-02-10", "sampled": 100, "sprouted": 78, "rate": 0.78 },
+        { "at": "2026-04-10", "sampled": 100, "sprouted": 71, "rate": 0.71 },
+        { "at": "2026-05-20", "sampled": 100, "sprouted": 55, "rate": 0.55 }
+      ]
+    }
+  ],
+  "belowThreshold": [
+    {
+      "batchId": "RS-002",
+      "species": "珙桐",
+      "latestRate": 0.55,
+      "latestRateFormatted": "55.0%",
+      "threshold": 0.6,
+      "latestTestDate": "2026-05-20"
+    },
+    {
+      "batchId": "RS-004",
+      "species": "望天树",
+      "latestRate": 0.52,
+      "latestRateFormatted": "52.0%",
+      "threshold": 0.6,
+      "latestTestDate": "2026-01-20"
+    }
+  ],
+  "longTermNoRetest": [
+    {
+      "batchId": "RS-005",
+      "species": "水杉",
+      "latestRate": 0.88,
+      "daysSinceLastTest": 125,
+      "latestTestDate": "2026-02-15"
+    }
+  ],
+  "allAnalyses": [
+    {
+      "batchId": "RS-001",
+      "species": "独叶草",
+      "latestRate": 0.72,
+      "trendDirection": "declining",
+      "riskLevel": "warning",
+      "riskReasons": ["declining_trend"],
+      "daysSinceLastTest": 8
+    },
+    {
+      "batchId": "RS-002",
+      "species": "珙桐",
+      "latestRate": 0.55,
+      "trendDirection": "declining",
+      "riskLevel": "critical",
+      "riskReasons": ["rate_below_threshold", "declining_trend"],
+      "daysSinceLastTest": 31
+    }
+  ]
+}
+```
+
+**响应字段说明：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `generatedAt` | string | 报告生成时间 |
+| `options` | object | 本次分析使用的阈值参数 |
+| `summary` | object | 风险等级统计汇总 |
+| `continuouslyDeclining` | array | 连续下降批次列表 |
+| `belowThreshold` | array | 萌发率低于阈值批次列表 |
+| `longTermNoRetest` | array | 长期未复测批次列表 |
+| `allAnalyses` | array | 所有批次的活性分析摘要 |
+
+#### GET `/batches/:id/viability` — 批次活性分析详情
+
+获取单个批次的完整活性趋势分析。
+
+**查询参数（可选）：**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `lowRateThreshold` | number | 自定义低萌发率阈值 |
+| `consecutiveDeclineThreshold` | number | 自定义连续下降次数阈值 |
+| `longTermDays` | number | 自定义长期未复测天数 |
+| `significantChangeThreshold` | number | 自定义显著变化阈值 |
+
+**请求示例：**
+
+```bash
+curl http://localhost:3035/batches/RS-002/viability
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-002",
+  "latestGermination": {
+    "at": "2026-05-20",
+    "sampled": 100,
+    "sprouted": 55,
+    "rate": 0.55
+  },
+  "latestRate": 0.55,
+  "daysSinceLastTest": 31,
+  "trendDirection": "declining",
+  "trendReason": "consecutive_decline",
+  "trendChange": -0.23,
+  "riskLevel": "critical",
+  "riskReasons": ["rate_below_threshold", "declining_trend"],
+  "germinationCount": 3,
+  "germinationHistory": [
+    { "at": "2026-02-10", "sampled": 100, "sprouted": 78, "rate": 0.78 },
+    { "at": "2026-04-10", "sampled": 100, "sprouted": 71, "rate": 0.71 },
+    { "at": "2026-05-20", "sampled": 100, "sprouted": 55, "rate": 0.55 }
+  ]
+}
+```
+
+#### GET `/batches?riskLevel=critical` — 按风险等级筛选
+
+在批次列表接口中新增 `riskLevel` 查询参数，筛选指定风险等级的批次。
+
+**可用值：**
+- `normal` - 正常
+- `warning` - 警告
+- `critical` - 严重
+- `unknown` - 未知
+
+**请求示例：**
+
+```bash
+# 仅显示严重风险批次
+curl "http://localhost:3035/batches?riskLevel=critical"
+
+# 组合筛选：警告风险 + A2分区
+curl "http://localhost:3035/batches?riskLevel=warning&section=A2"
+```
+
+**响应示例：**
+
+```json
+[
+  {
+    "id": "RS-002",
+    "species": "珙桐",
+    "quantity": 950,
+    "trendSummary": {
+      "latestRate": 0.55,
+      "latestRateFormatted": "55.0%",
+      "trendDirection": "declining",
+      "riskLevel": "critical",
+      "daysSinceLastTest": 31
+    },
+    ...
+  }
+]
+```
+
+#### GET `/batches/:id` — 批次详情（含趋势摘要）
+
+批次详情接口已包含 `trendSummary` 字段，可直接查看活性趋势。
+
+**响应示例（节选）：**
+
+```json
+{
+  "id": "RS-001",
+  "species": "独叶草",
+  "quantity": 1800,
+  "germinations": [
+    { "at": "2026-01-15", "sampled": 100, "sprouted": 85, "rate": 0.85 },
+    { "at": "2026-03-15", "sampled": 100, "sprouted": 82, "rate": 0.82 },
+    { "at": "2026-05-15", "sampled": 100, "sprouted": 78, "rate": 0.78 },
+    { "at": "2026-06-12", "sampled": 100, "sprouted": 72, "rate": 0.72 }
+  ],
+  "trendSummary": {
+    "latestRate": 0.72,
+    "latestRateFormatted": "72.0%",
+    "trendDirection": "declining",
+    "riskLevel": "warning",
+    "daysSinceLastTest": 8
+  },
+  ...
+}
+```
+
+### 示例数据说明
+
+示例数据中包含6个批次，覆盖各种风险场景：
+
+| 批次 | 物种 | 风险等级 | 说明 |
+|------|------|----------|------|
+| RS-001 | 独叶草 | warning | 整体下降趋势（85%→82%→78%→72%） |
+| RS-002 | 珙桐 | critical | 连续下降 + 低于阈值（78%→71%→55%） |
+| RS-003 | 红豆杉 | normal | 稳定高活性（92%→90%→89%） |
+| RS-004 | 望天树 | warning | 低于阈值（52%） |
+| RS-005 | 水杉 | warning | 长期未复测（125天） |
+| RS-006 | 银杏 | unknown | 无萌发实验数据 |
+
+### 计算模块
+
+活性趋势分析的核心计算逻辑独立在 [viability-trend.js](file:///Users/ali/Desktop/zfl%20new%20solo%20coder/zfl-35/lib/viability-trend.js) 模块中，提供以下可复用函数：
+
+| 函数 | 说明 |
+|------|------|
+| `analyzeBatchViability(batch, options)` | 完整分析单个批次的活性趋势 |
+| `getBatchTrendSummary(batch, options)` | 获取批次的趋势摘要（用于列表和详情） |
+| `filterBatchesByRisk(batches, riskLevel, options)` | 按风险等级筛选批次 |
+| `isRiskLevel(batch, level, options)` | 判断批次是否属于指定风险等级 |
+| `generateViabilityRiskReport(options)` | 生成全局风险报告 |
+| `getBatchViabilityAnalysis(batchId, options)` | 从数据库加载批次并分析 |
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `batch_not_found` | 404 | 批次不存在 |
