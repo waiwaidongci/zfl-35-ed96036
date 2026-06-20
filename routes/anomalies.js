@@ -46,7 +46,8 @@ const routes = [
         : body.threshold
           ? Number(body.threshold)
           : undefined;
-      return anomalyStore.scanAndDetectAnomalies(batchId, threshold, makeCtx(req, body));
+      const siteId = url.searchParams.get("siteId") || body.siteId || null;
+      return anomalyStore.scanAndDetectAnomalies(batchId, threshold, makeCtx(req, body), siteId);
     }
   }
 ];
