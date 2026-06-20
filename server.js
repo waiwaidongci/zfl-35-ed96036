@@ -17,7 +17,14 @@ import {
   mutate,
   OPERATION,
   clone,
-  getRequestContext
+  getRequestContext,
+  filterBatchesBySite,
+  getDefaultSiteId,
+  listSites,
+  getSite,
+  getDefaultSite,
+  createSite,
+  DEFAULT_SITE_ID
 } from "./lib/data-store.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -85,7 +92,84 @@ const server = http.createServer(async (req, res) => {
     if (auditHandled) return;
 
     const db = await loadDb();
-    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "POST /batches/:id/split", "POST /batches/merge", "GET /anomalies/pending", "GET /batches/:id/anomalies?status=", "PATCH /batches/:id/anomalies/:anomalyId/handle", "POST /anomalies/scan?batchId=&threshold=", "GET /reports/inventory", "GET /reports/viability-risk?lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=", "GET /batches/:id/viability", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch", "POST /imports/preview", "POST /imports/confirm", "GET /audit-logs", "GET /audit-logs/stats", "GET /batches/:id/history/timeline", "GET /batches/:id/history/replay"] });
+    if (req.method === "GET" && url.pathname === "/") {
+      const endpoints = [
+        "GET /sites",
+        "GET /sites/:id",
+        "POST /sites",
+        "GET /batches?siteId=&species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=",
+        "POST /batches",
+        "GET /batches/:id",
+        "PATCH /batches/:id/remark",
+        "GET /batches/:id/reviews",
+        "POST /batches/:id/reviews",
+        "POST /batches/:id/transactions",
+        "POST /batches/:id/temperatures",
+        "POST /batches/:id/germinations",
+        "POST /batches/:id/reservations",
+        "GET /batches/:id/reservations?status=",
+        "PATCH /batches/:id/reservations/:reservationId/approve",
+        "PATCH /batches/:id/reservations/:reservationId/reject",
+        "PATCH /batches/:id/reservations/:reservationId/cancel",
+        "POST /batches/:id/reservations/:reservationId/fulfill",
+        "POST /batches/:id/split",
+        "POST /batches/merge",
+        "GET /anomalies/pending?siteId=",
+        "GET /batches/:id/anomalies?status=",
+        "PATCH /batches/:id/anomalies/:anomalyId/handle",
+        "POST /anomalies/scan?batchId=&threshold=&siteId=",
+        "GET /reports/inventory?siteId=",
+        "GET /reports/viability-risk?siteId=&lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=",
+        "GET /batches/:id/viability",
+        "GET /locations/sites",
+        "GET /locations/sections?siteId=",
+        "POST /locations/sections",
+        "GET /locations/sections/:id",
+        "GET /locations/sections/:id/free-slots",
+        "POST /locations/sections/:id/boxes",
+        "GET /locations/boxes/:id",
+        "PATCH /locations/boxes/:id/slots/:index",
+        "GET /locations/batches/:id/slots",
+        "GET /labels/batches/:id",
+        "GET /labels/batches?siteId=&species=&collectionPlace=&section=&viability=",
+        "POST /labels/batches/batch",
+        "POST /imports/preview",
+        "POST /imports/confirm",
+        "GET /audit-logs?siteId=",
+        "GET /audit-logs/stats",
+        "GET /batches/:id/history/timeline",
+        "GET /batches/:id/history/replay"
+      ];
+      return send(res, 200, { service: "稀有种子冷库库存和活性追踪API（多站点版）", endpoints });
+    }
+
+    if (req.method === "GET" && url.pathname === "/sites") {
+      const sites = await listSites();
+      const defaultSite = sites.find(s => s.isDefault);
+      return send(res, 200, {
+        total: sites.length,
+        defaultSiteId: defaultSite ? defaultSite.id : null,
+        sites
+      });
+    }
+
+    if (req.method === "GET" && url.pathname.startsWith("/sites/")) {
+      const siteId = decodeURIComponent(url.pathname.slice("/sites/".length));
+      const site = await getSite(siteId);
+      if (!site) return send(res, 404, { error: "site_not_found" });
+      return send(res, 200, site);
+    }
+
+    if (req.method === "POST" && url.pathname === "/sites") {
+      const input = await body(req);
+      const ctx = makeCtx(req, input);
+      if (!input.id) return send(res, 400, { error: "missing_site_id" });
+      const result = await createSite(input, ctx);
+      if (result.error) {
+        return send(res, result.error === "site_already_exists" ? 409 : 400, result);
+      }
+      return send(res, 201, result.site || result);
+    }
 
     if (req.method === "POST" && url.pathname === "/batches/merge") {
       const input = await body(req);
@@ -98,7 +182,15 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && url.pathname === "/batches") {
+      const defaultId = getDefaultSiteId(db);
+      const siteIdParam = url.searchParams.get("siteId");
+      const effectiveSiteId = siteIdParam || defaultId;
+      const appliedSiteFilter = siteIdParam ? "specified" : "default";
+
       let rows = db.batches;
+      if (effectiveSiteId !== "all") {
+        rows = filterBatchesBySite(rows, effectiveSiteId, defaultId);
+      }
       for (const key of ["species", "collectionPlace", "section", "viability", "status"]) {
         const value = url.searchParams.get(key);
         if (value) rows = rows.filter(batch => String(batch[key]).includes(value));
@@ -120,12 +212,27 @@ const server = http.createServer(async (req, res) => {
         ensureLineageFields(batch);
         batch.trendSummary = getBatchTrendSummary(batch);
       }
-      return send(res, 200, rows);
+      return send(res, 200, {
+        siteFilter: {
+          siteId: effectiveSiteId === "all" ? null : effectiveSiteId,
+          applied: appliedSiteFilter,
+          note: effectiveSiteId === "all"
+            ? "已查询所有站点"
+            : siteIdParam
+              ? `按指定站点 ${effectiveSiteId} 筛选`
+              : `未传 siteId，使用默认站点 ${effectiveSiteId}`
+        },
+        total: rows.length,
+        batches: rows
+      });
     }
 
     if (req.method === "POST" && url.pathname === "/batches") {
       const input = await body(req);
       const ctx = makeCtx(req, input);
+
+      const defaultId = getDefaultSiteId(db);
+      const batchSiteId = input.siteId || defaultId;
 
       const result = await mutate({
         operation: OPERATION.BATCH_CREATE,
@@ -138,6 +245,7 @@ const server = http.createServer(async (req, res) => {
         mutator: (dbInner) => {
           const batch = {
             id: input.id || `RS-${Date.now()}`,
+            siteId: batchSiteId,
             species: input.species,
             collectionPlace: input.collectionPlace,
             motherPlant: input.motherPlant,
@@ -378,7 +486,8 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && url.pathname === "/reports/inventory") {
-      const report = await getInventoryWithFrozen();
+      const siteIdParam = url.searchParams.get("siteId");
+      const report = await getInventoryWithFrozen(siteIdParam || null);
       return send(res, 200, report);
     }
     send(res, 404, { error: "not_found" });

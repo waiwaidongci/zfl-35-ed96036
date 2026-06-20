@@ -6,7 +6,136 @@
 npm start
 ```
 
-默认端口`3035`。支持批次、温度、取样、萌发实验、库存流水、负库存拦截、批次备注、人工复核和取样预约。
+默认端口`3035`。支持多冷库站点、批次、温度、取样、萌发实验、库存流水、负库存拦截、批次备注、人工复核和取样预约。
+
+## 多冷库站点同步模块
+
+将单一冷库库存扩展为多站点模型。每个批次归属某个站点，库存流水、温度、萌发实验和报告都可按站点隔离查询，同时保留全局汇总报告。旧数据自动迁移到默认站点。
+
+### 核心概念
+
+- **站点（Site）**：独立的冷库单位，每个站点有独立的分区、冷盒和批次
+- **默认站点**：系统自动创建 `SITE-001`（主冷库），所有旧数据和未指定站点的新数据自动归属此站点
+- **站点隔离**：批次、库区、温度记录、萌发实验、库存流水按站点隔离查询
+- **全局汇总**：使用 `siteId=all` 可获取所有站点的汇总报告
+
+### 接口默认行为
+
+所有支持 `siteId` 参数的接口遵循以下规则：
+
+| siteId 参数 | 行为 |
+|-------------|------|
+| 不传 | 使用默认站点（SITE-001），返回结果包含 `siteFilter` 说明使用了默认站点 |
+| 具体站点 ID（如 `SITE-002`） | 仅查询该站点的数据 |
+| `all` | 全局汇总，返回所有站点数据（仅报告类接口支持） |
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/sites` | 列出所有站点 |
+| GET | `/sites/:id` | 获取单个站点详情 |
+| POST | `/sites` | 创建新站点 |
+| GET | `/batches?siteId=` | 按站点筛选批次列表 |
+| POST | `/batches` | 创建批次（支持 siteId 字段） |
+| GET | `/reports/inventory?siteId=` | 库存报告（支持站点隔离和全局汇总） |
+| GET | `/reports/viability-risk?siteId=` | 活性风险报告（支持站点隔离） |
+| GET | `/anomalies/pending?siteId=` | 温度异常列表（支持站点隔离） |
+| GET | `/audit-logs?siteId=` | 审计日志（支持站点筛选） |
+| GET | `/locations/sections?siteId=` | 库位分区列表（支持站点筛选） |
+| POST | `/locations/sections` | 新增分区（支持 siteId 字段） |
+| GET | `/labels/batches?siteId=` | 标签打印数据（支持站点筛选） |
+
+### 数据结构
+
+#### 站点字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 站点 ID（如 SITE-001） |
+| `name` | string | 站点名称 |
+| `code` | string | 站点代码 |
+| `address` | string | 站点地址/库区位置 |
+| `isDefault` | boolean | 是否为默认站点 |
+
+#### 批次字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `siteId` | string | 所属站点 ID，旧数据自动填充为默认站点 |
+
+#### 分区字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `siteId` | string | 所属站点 ID，旧分区自动填充为默认站点 |
+
+### 数据迁移
+
+- 首次启动时自动检测旧数据（无 siteId 字段）
+- 所有旧批次和旧分区自动归属默认站点（SITE-001）
+- 迁移过程不可逆，但数据内容不变
+
+### 接口详情
+
+#### GET `/sites` — 列出所有站点
+
+```bash
+curl http://localhost:3035/sites
+```
+
+**响应示例：**
+
+```json
+[
+  { "id": "SITE-001", "name": "主冷库", "code": "MAIN", "address": "一号库区", "isDefault": true },
+  { "id": "SITE-002", "name": "二号备库", "code": "BACKUP", "address": "二号库区", "isDefault": false }
+]
+```
+
+#### POST `/sites` — 创建新站点
+
+```bash
+curl -X POST http://localhost:3035/sites \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "三号冷库",
+    "code": "BRANCH-3",
+    "address": "三号库区",
+    "isDefault": false
+  }'
+```
+
+#### GET `/reports/inventory?siteId=all` — 全局汇总报告
+
+```bash
+curl "http://localhost:3035/reports/inventory?siteId=all"
+```
+
+全局报告新增 `siteDetails` 字段，包含每个站点的独立统计。
+
+#### GET `/reports/inventory` — 默认站点报告
+
+不传 `siteId` 时自动使用默认站点，响应中包含：
+
+```json
+{
+  "siteFilter": {
+    "siteId": "SITE-001",
+    "applied": "default",
+    "note": "未传 siteId，使用默认站点 SITE-001"
+  },
+  ...
+}
+```
+
+### 约束
+
+- 批次合并时，所有来源批次必须来自同一站点
+- 批次拆分时，子批次自动继承来源批次的站点
+- 批量导入时，未指定 `siteId` 的行自动归属默认站点
+- 审计日志按站点筛选时，仅返回涉及该站点批次的操作记录
+
 
 ## 批次备注与人工复核模块
 

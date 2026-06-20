@@ -16,7 +16,8 @@
           "slotCapacity": 20,
           "slots": []
         }
-      ]
+      ],
+      "siteId": "SITE-001"
     },
     {
       "id": "A2",
@@ -51,7 +52,8 @@
             }
           ]
         }
-      ]
+      ],
+      "siteId": "SITE-001"
     },
     {
       "id": "B1",
@@ -63,7 +65,8 @@
           "slotCapacity": 24,
           "slots": []
         }
-      ]
+      ],
+      "siteId": "SITE-001"
     },
     {
       "id": "C1",
@@ -80,7 +83,65 @@
             }
           ]
         }
+      ],
+      "siteId": "SITE-001"
+    },
+    {
+      "id": "A3",
+      "name": "A3中温区",
+      "siteId": "SITE-001",
+      "boxes": [
+        {
+          "id": "C-冷盒-10",
+          "name": "冷盒10",
+          "slotCapacity": 16,
+          "slots": []
+        }
       ]
+    },
+    {
+      "id": "A1-BK",
+      "name": "A1备库低温区",
+      "siteId": "SITE-002",
+      "boxes": [
+        {
+          "id": "C-冷盒-12",
+          "name": "备库冷盒12",
+          "slotCapacity": 20,
+          "slots": []
+        },
+        {
+          "id": "C-冷盒-13",
+          "name": "备库冷盒13",
+          "slotCapacity": 20,
+          "slots": []
+        }
+      ]
+    },
+    {
+      "id": "A3-BK",
+      "name": "A3备库中温区",
+      "siteId": "SITE-002",
+      "boxes": [
+        {
+          "id": "C-冷盒-11",
+          "name": "备库冷盒11",
+          "slotCapacity": 16,
+          "slots": []
+        }
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "id": "SITE-001",
+      "name": "主冷库",
+      "code": "MAIN"
+    },
+    {
+      "id": "SITE-002",
+      "name": "二号备库",
+      "code": "BACKUP"
     }
   ]
 }

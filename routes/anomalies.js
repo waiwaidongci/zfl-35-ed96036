@@ -14,7 +14,11 @@ const routes = [
   {
     method: "GET",
     pattern: /^\/anomalies\/pending$/,
-    handler: async () => anomalyStore.listPendingAnomalies()
+    handler: async (req) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const siteId = url.searchParams.get("siteId") || null;
+      return anomalyStore.listPendingAnomalies(siteId);
+    }
   },
   {
     method: "GET",

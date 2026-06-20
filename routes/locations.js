@@ -10,7 +10,15 @@ function makeCtx(req, input = {}) {
 }
 
 const routes = [
-  { method: "GET", pattern: /^\/locations\/sections$/, handler: async () => store.listSections() },
+  {
+    method: "GET",
+    pattern: /^\/locations\/sections$/,
+    handler: async (req) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const siteId = url.searchParams.get("siteId") || null;
+      return store.listSections(siteId);
+    }
+  },
   { method: "POST", pattern: /^\/locations\/sections$/, handler: async (req, _res, body) => store.createSection(body, makeCtx(req, body)) },
   { method: "GET", pattern: /^\/locations\/sections\/([^/]+)\/free-slots$/, handler: async (_req, _res, _body, params) => store.listFreeSlots(params[1]) },
   { method: "GET", pattern: /^\/locations\/sections\/([^/]+)$/, handler: async (_req, _res, _body, params) => store.getSection(params[1]) },

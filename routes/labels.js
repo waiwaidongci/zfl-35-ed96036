@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildLabel, buildLabels } from "../lib/label-formatter.js";
 import * as locationStore from "../lib/location-store.js";
+import { getDefaultSiteId, filterBatchesBySite } from "../lib/data-store.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = join(__dirname, "..", "data", "rare-seeds.json");
@@ -40,6 +41,12 @@ const routes = [
       const db = await loadDb();
       const url = new URL(req.url, `http://${req.headers.host}`);
       let batches = db.batches;
+      const defaultSiteId = getDefaultSiteId(db);
+      const siteIdParam = url.searchParams.get("siteId") || null;
+      const effectiveSiteId = siteIdParam || defaultSiteId;
+      if (effectiveSiteId !== "all") {
+        batches = filterBatchesBySite(batches, effectiveSiteId, defaultSiteId);
+      }
       for (const key of ["species", "collectionPlace", "section", "viability"]) {
         const value = url.searchParams.get(key);
         if (value) {

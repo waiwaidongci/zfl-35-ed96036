@@ -11,13 +11,14 @@ const routes = [
       const consecutiveDeclineThreshold = url.searchParams.get("consecutiveDeclineThreshold");
       const longTermDays = url.searchParams.get("longTermDays");
       const significantChangeThreshold = url.searchParams.get("significantChangeThreshold");
+      const siteId = url.searchParams.get("siteId") || null;
 
       if (lowRateThreshold) options.lowRateThreshold = Number(lowRateThreshold);
       if (consecutiveDeclineThreshold) options.consecutiveDeclineThreshold = Number(consecutiveDeclineThreshold);
       if (longTermDays) options.longTermDays = Number(longTermDays);
       if (significantChangeThreshold) options.significantChangeThreshold = Number(significantChangeThreshold);
 
-      return viabilityStore.generateViabilityRiskReport(options);
+      return viabilityStore.generateViabilityRiskReport(options, siteId);
     }
   },
   {

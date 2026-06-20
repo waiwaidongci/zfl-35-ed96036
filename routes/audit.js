@@ -21,7 +21,8 @@ const routes = [
       if (toTime) filters.toTime = toTime;
       const limit = url.searchParams.get("limit");
       if (limit) filters.limit = Number(limit);
-      return auditLog.queryAuditLogs(filters);
+      const siteId = url.searchParams.get("siteId") || null;
+      return auditLog.queryAuditLogs(filters, siteId);
     }
   },
   {
