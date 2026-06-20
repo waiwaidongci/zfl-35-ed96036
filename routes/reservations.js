@@ -1,0 +1,67 @@
+import * as store from "../lib/reservation-store.js";
+
+const routes = [
+  {
+    method: "POST",
+    pattern: /^\/batches\/([^/]+)\/reservations$/,
+    handler: async (_req, _res, body, params) => store.createReservation(params[1], body)
+  },
+  {
+    method: "GET",
+    pattern: /^\/batches\/([^/]+)\/reservations$/,
+    handler: async (req, _res, _body, params) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const status = url.searchParams.get("status") || "";
+      return store.listReservations(params[1], status);
+    }
+  },
+  {
+    method: "PATCH",
+    pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/approve$/,
+    handler: async (_req, _res, _body, params) => store.approveReservation(params[1], params[2])
+  },
+  {
+    method: "PATCH",
+    pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/reject$/,
+    handler: async (_req, _res, _body, params) => store.rejectReservation(params[1], params[2])
+  },
+  {
+    method: "PATCH",
+    pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/cancel$/,
+    handler: async (_req, _res, _body, params) => store.cancelReservation(params[1], params[2])
+  },
+  {
+    method: "POST",
+    pattern: /^\/batches\/([^/]+)\/reservations\/([^/]+)\/fulfill$/,
+    handler: async (_req, _res, _body, params) => store.fulfillReservation(params[1], params[2])
+  }
+];
+
+export async function handleReservationRoutes(req, res, send, readBody) {
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  for (const route of routes) {
+    if (req.method !== route.method) continue;
+    const match = url.pathname.match(route.pattern);
+    if (!match) continue;
+    const decoded = match.map((v, i) => i === 0 ? v : decodeURIComponent(v));
+    const input = (route.method === "GET") ? {} : await readBody(req);
+    const result = await route.handler(req, res, input, decoded);
+    if (result === null) { send(res, 404, { error: "not_found" }); return true; }
+    if (result.error) {
+      const statusMap = {
+        batch_not_found: 404,
+        reservation_not_found: 404,
+        invalid_quantity: 400,
+        invalid_status_transition: 409,
+        insufficient_available_quantity: 409,
+        negative_inventory_blocked: 409
+      };
+      send(res, statusMap[result.error] || 400, result);
+      return true;
+    }
+    const status = (req.method === "POST" && !result.error) ? 201 : 200;
+    send(res, status, result);
+    return true;
+  }
+  return false;
+}

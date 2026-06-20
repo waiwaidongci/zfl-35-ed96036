@@ -6,7 +6,7 @@
 npm start
 ```
 
-默认端口`3035`。支持批次、温度、取样、萌发实验、库存流水、负库存拦截、批次备注和人工复核。
+默认端口`3035`。支持批次、温度、取样、萌发实验、库存流水、负库存拦截、批次备注、人工复核和取样预约。
 
 ## 批次备注与人工复核模块
 
@@ -172,7 +172,269 @@ curl "http://localhost:3035/batches?hasPendingReview=true"
 |--------|----------|------|
 | `batch_not_found` | 404 | 批次不存在 |
 
-## 库位管理模块
+## 取样预约模块
+
+用于在真正扣减库存前登记实验室的取样申请。预约创建时状态为 `pending`；批准后冻结对应数量（不直接扣库存）；转为实际取样时写入 transactions 并释放冻结量；拒绝或取消已批准的预约也会释放冻结量。
+
+### 核心概念
+
+- **冻结库存（frozenQuantity）**：已批准但尚未实际取样的预约数量之和。`可用库存 = 实际库存 - 冻结库存`
+- **状态流转**：`pending` → `approved` → `fulfilled`；或 `pending` → `rejected`；或 `pending`/`approved` → `cancelled`
+- 批准时仅冻结数量，不扣减实际库存
+- 转为实际取样（fulfill）时写入一条 `sample` 类型的 transaction，同时释放冻结量
+- 取消已批准的预约会释放冻结量
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/batches/:id/reservations` | 创建取样预约 |
+| GET | `/batches/:id/reservations?status=` | 查询预约列表（可按状态筛选） |
+| PATCH | `/batches/:id/reservations/:reservationId/approve` | 批准预约（冻结数量） |
+| PATCH | `/batches/:id/reservations/:reservationId/reject` | 拒绝预约 |
+| PATCH | `/batches/:id/reservations/:reservationId/cancel` | 取消预约 |
+| POST | `/batches/:id/reservations/:reservationId/fulfill` | 转为实际取样（扣库存、释放冻结） |
+
+### 数据结构
+
+#### 批次字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `frozenQuantity` | number | 冻结库存数量（已批准但未实际取样的预约数量之和） |
+| `reservations` | array | 取样预约记录列表 |
+
+#### 预约记录字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 预约ID（格式 `RES-时间戳`） |
+| `applicant` | string | 申请人 |
+| `purpose` | string | 用途 |
+| `quantity` | number | 预计取样数量 |
+| `plannedDate` | string | 计划日期 |
+| `status` | string | 状态：`pending`（待审批）、`approved`（已批准）、`rejected`（已拒绝）、`cancelled`（已取消）、`fulfilled`（已转为实际取样） |
+| `createdAt` | string | 创建时间（ISO格式） |
+| `updatedAt` | string | 最近更新时间（ISO格式） |
+| `fulfilledAt` | string | 转为实际取样的时间（仅fulfilled状态） |
+
+### 接口详情
+
+#### POST `/batches/:id/reservations` — 创建取样预约
+
+创建一条取样预约，状态初始为 `pending`，不冻结库存。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `applicant` | string | 是 | 申请人 |
+| `purpose` | string | 是 | 用途 |
+| `quantity` | number | 是 | 预计取样数量（必须大于0） |
+| `plannedDate` | string | 否 | 计划日期 |
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/RS-001/reservations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicant": "张研究员",
+    "purpose": "基因多样性分析",
+    "quantity": 200,
+    "plannedDate": "2026-07-01"
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "reservation": {
+    "id": "RES-1718888888888",
+    "applicant": "张研究员",
+    "purpose": "基因多样性分析",
+    "quantity": 200,
+    "plannedDate": "2026-07-01",
+    "status": "pending",
+    "createdAt": "2026-06-20T10:00:00.000Z",
+    "updatedAt": "2026-06-20T10:00:00.000Z"
+  }
+}
+```
+
+#### GET `/batches/:id/reservations?status=` — 查询预约列表
+
+获取指定批次的预约列表，可按状态筛选。
+
+**请求示例：**
+
+```bash
+# 查询全部预约
+curl http://localhost:3035/batches/RS-001/reservations
+
+# 仅查询已批准的预约
+curl "http://localhost:3035/batches/RS-001/reservations?status=approved"
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "reservations": [
+    {
+      "id": "RES-1718888888888",
+      "applicant": "张研究员",
+      "purpose": "基因多样性分析",
+      "quantity": 200,
+      "plannedDate": "2026-07-01",
+      "status": "pending",
+      "createdAt": "2026-06-20T10:00:00.000Z",
+      "updatedAt": "2026-06-20T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### PATCH `/batches/:id/reservations/:reservationId/approve` — 批准预约
+
+将 `pending` 状态的预约批准为 `approved`，同时冻结对应数量。若可用库存不足则返回错误。
+
+**请求示例：**
+
+```bash
+curl -X PATCH http://localhost:3035/batches/RS-001/reservations/RES-1718888888888/approve
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "reservation": {
+    "id": "RES-1718888888888",
+    "applicant": "张研究员",
+    "purpose": "基因多样性分析",
+    "quantity": 200,
+    "plannedDate": "2026-07-01",
+    "status": "approved",
+    "createdAt": "2026-06-20T10:00:00.000Z",
+    "updatedAt": "2026-06-20T10:05:00.000Z"
+  },
+  "frozenQuantity": 200,
+  "availableQuantity": 1600
+}
+```
+
+#### PATCH `/batches/:id/reservations/:reservationId/reject` — 拒绝预约
+
+将 `pending` 状态的预约拒绝为 `rejected`，不涉及冻结量变动。
+
+**请求示例：**
+
+```bash
+curl -X PATCH http://localhost:3035/batches/RS-001/reservations/RES-1718888888888/reject
+```
+
+#### PATCH `/batches/:id/reservations/:reservationId/cancel` — 取消预约
+
+取消 `pending` 或 `approved` 状态的预约。若预约已批准，会同时释放冻结量。
+
+**请求示例：**
+
+```bash
+curl -X PATCH http://localhost:3035/batches/RS-001/reservations/RES-1718888888888/cancel
+```
+
+#### POST `/batches/:id/reservations/:reservationId/fulfill` — 转为实际取样
+
+将 `approved` 状态的预约转为实际取样。释放冻结量，扣减实际库存，写入一条 `sample` 类型的 transaction。
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/RS-001/reservations/RES-1718888888888/fulfill
+```
+
+**响应示例：**
+
+```json
+{
+  "batchId": "RS-001",
+  "reservation": {
+    "id": "RES-1718888888888",
+    "applicant": "张研究员",
+    "purpose": "基因多样性分析",
+    "quantity": 200,
+    "plannedDate": "2026-07-01",
+    "status": "fulfilled",
+    "createdAt": "2026-06-20T10:00:00.000Z",
+    "updatedAt": "2026-06-20T12:00:00.000Z",
+    "fulfilledAt": "2026-06-20T12:00:00.000Z"
+  },
+  "transaction": {
+    "id": "TX-1718890000000",
+    "at": "2026-06-20T12:00:00.000Z",
+    "type": "sample",
+    "quantity": 200,
+    "balance": 1600,
+    "note": "取样预约 RES-1718888888888 转实际取样，申请人：张研究员，用途：基因多样性分析"
+  },
+  "quantity": 1600,
+  "frozenQuantity": 0,
+  "availableQuantity": 1600
+}
+```
+
+### 库存报告（更新）
+
+`GET /reports/inventory` 接口现在同时展示可用库存和冻结库存。
+
+**响应示例：**
+
+```json
+{
+  "total": 1800,
+  "totalFrozen": 200,
+  "totalAvailable": 1600,
+  "bySpecies": { "独叶草": 1800 },
+  "bySection": { "A2": 1800 },
+  "frozenBySpecies": { "独叶草": 200 },
+  "frozenBySection": { "A2": 200 },
+  "lowStock": [
+    {
+      "id": "RS-001",
+      "species": "独叶草",
+      "quantity": 1800,
+      "frozenQuantity": 200,
+      "availableQuantity": 1600
+    }
+  ]
+}
+```
+
+新增字段说明：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `totalFrozen` | number | 冻结库存总量 |
+| `totalAvailable` | number | 可用库存总量 |
+| `frozenBySpecies` | object | 按物种分组的冻结库存 |
+| `frozenBySection` | object | 按分区分组的冻结库存 |
+| `lowStock` | array | 可用库存低于200的批次（含 `frozenQuantity` 和 `availableQuantity`） |
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `batch_not_found` | 404 | 批次不存在 |
+| `reservation_not_found` | 404 | 预约不存在 |
+| `invalid_quantity` | 400 | 预约数量无效（必须大于0） |
+| `invalid_status_transition` | 409 | 状态流转不合法 |
+| `insufficient_available_quantity` | 409 | 可用库存不足，无法批准 |
+| `negative_inventory_blocked` | 409 | 库存不足，转实际取样会导致负库存 |
 
 冷库按 **分区（Section）→ 冷盒（Box）→ 格位（Slot）** 三级结构管理。现有批次的 `section` 和 `container` 字段保持不变，库位模块通过 `batchId` 关联格位与批次。
 

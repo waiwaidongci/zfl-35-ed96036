@@ -5,6 +5,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleLocationRoutes } from "./routes/locations.js";
 import { handleLabelRoutes } from "./routes/labels.js";
+import { handleReservationRoutes } from "./routes/reservations.js";
+import { getInventoryWithFrozen } from "./lib/reservation-store.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = join(__dirname, "data", "rare-seeds.json");
@@ -26,6 +28,8 @@ const seed = {
         { id: "TX-1", at: "2026-05-20", type: "collect", quantity: 1800, balance: 1800, note: "采集入库" }
       ],
       germinations: [{ at: "2026-06-12", sampled: 100, sprouted: 72, rate: 0.72 }],
+      frozenQuantity: 0,
+      reservations: [],
       remark: "初始入库批次，待质量复核",
       reviews: [
         { id: "RV-1", at: "2026-05-25T10:30:00.000Z", reviewer: "李管理员", conclusion: "pending", note: "初步检查种子外观完整，等待萌发实验结果后最终确认" }
@@ -73,8 +77,11 @@ const server = http.createServer(async (req, res) => {
     const labelHandled = await handleLabelRoutes(req, res, send, body);
     if (labelHandled) return;
 
+    const reservationHandled = await handleReservationRoutes(req, res, send, body);
+    if (reservationHandled) return;
+
     const db = await loadDb();
-    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "GET /reports/inventory", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
+    if (req.method === "GET" && url.pathname === "/") return send(res, 200, { service: "稀有种子冷库库存和活性追踪API", endpoints: ["GET /batches?species=&collectionPlace=&section=&viability=&hasPendingReview=", "POST /batches", "GET /batches/:id", "PATCH /batches/:id/remark", "GET /batches/:id/reviews", "POST /batches/:id/reviews", "POST /batches/:id/transactions", "POST /batches/:id/temperatures", "POST /batches/:id/germinations", "POST /batches/:id/reservations", "GET /batches/:id/reservations?status=", "PATCH /batches/:id/reservations/:reservationId/approve", "PATCH /batches/:id/reservations/:reservationId/reject", "PATCH /batches/:id/reservations/:reservationId/cancel", "POST /batches/:id/reservations/:reservationId/fulfill", "GET /reports/inventory", "GET /locations/sections", "POST /locations/sections", "GET /locations/sections/:id", "GET /locations/sections/:id/free-slots", "POST /locations/sections/:id/boxes", "GET /locations/boxes/:id", "PATCH /locations/boxes/:id/slots/:index", "GET /locations/batches/:id/slots", "GET /labels/batches/:id", "GET /labels/batches", "POST /labels/batches/batch"] });
     if (req.method === "GET" && url.pathname === "/batches") {
       let rows = db.batches;
       for (const key of ["species", "collectionPlace", "section", "viability"]) {
@@ -91,7 +98,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "POST" && url.pathname === "/batches") {
       const input = await body(req);
-      const batch = { id: input.id || `RS-${Date.now()}`, species: input.species, collectionPlace: input.collectionPlace, motherPlant: input.motherPlant, container: input.container, section: input.section, viability: input.viability || "unknown", quantity: Number(input.quantity || 0), temperatures: [], transactions: [], germinations: [], remark: input.remark || "", reviews: [] };
+      const batch = { id: input.id || `RS-${Date.now()}`, species: input.species, collectionPlace: input.collectionPlace, motherPlant: input.motherPlant, container: input.container, section: input.section, viability: input.viability || "unknown", quantity: Number(input.quantity || 0), temperatures: [], transactions: [], germinations: [], frozenQuantity: 0, reservations: [], remark: input.remark || "", reviews: [] };
       batch.transactions.push({ id: `TX-${Date.now()}`, at: new Date().toISOString(), type: "collect", quantity: batch.quantity, balance: batch.quantity, note: "新批次入库" });
       db.batches.push(batch);
       await saveDb(db);
@@ -105,6 +112,8 @@ const server = http.createServer(async (req, res) => {
       if (req.method === "GET" && !action) {
         if (!batch.reviews) batch.reviews = [];
         if (batch.remark === undefined) batch.remark = "";
+        if (!batch.reservations) batch.reservations = [];
+        if (batch.frozenQuantity === undefined || batch.frozenQuantity === null) batch.frozenQuantity = 0;
         return send(res, 200, batch);
       }
       const input = await body(req);
@@ -155,14 +164,8 @@ const server = http.createServer(async (req, res) => {
       }
     }
     if (req.method === "GET" && url.pathname === "/reports/inventory") {
-      const total = db.batches.reduce((sum, b) => sum + b.quantity, 0);
-      const bySpecies = {};
-      const bySection = {};
-      for (const b of db.batches) {
-        bySpecies[b.species] = (bySpecies[b.species] || 0) + b.quantity;
-        bySection[b.section] = (bySection[b.section] || 0) + b.quantity;
-      }
-      return send(res, 200, { total, bySpecies, bySection, lowStock: db.batches.filter(b => b.quantity < 200).map(b => ({ id: b.id, species: b.species, quantity: b.quantity })) });
+      const report = await getInventoryWithFrozen();
+      return send(res, 200, report);
     }
     send(res, 404, { error: "not_found" });
   } catch (error) {
