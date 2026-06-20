@@ -61,50 +61,7 @@
           "note": "初步检查种子外观完整，等待萌发实验结果后最终确认"
         }
       ],
-      "anomalies": [
-        {
-          "id": "ANOM-1781950098938-y9mhlf",
-          "batchId": "RS-001",
-          "temperatureAt": "2026-06-02T08:00:00.000Z",
-          "temperatureValue": -17.2,
-          "threshold": -18,
-          "severity": "abnormal",
-          "status": "pending",
-          "detectedAt": "2026-06-20T10:08:18.938Z",
-          "handledAt": null,
-          "handler": null,
-          "handlingResult": null,
-          "note": null
-        },
-        {
-          "id": "ANOM-1781950098942-y8i615",
-          "batchId": "RS-001",
-          "temperatureAt": "2026-06-03T08:00:00.000Z",
-          "temperatureValue": -12.5,
-          "threshold": -18,
-          "severity": "warning",
-          "status": "pending",
-          "detectedAt": "2026-06-20T10:08:18.942Z",
-          "handledAt": null,
-          "handler": null,
-          "handlingResult": null,
-          "note": null
-        },
-        {
-          "id": "ANOM-1781950098948-bdv7rz",
-          "batchId": "RS-001",
-          "temperatureAt": "2026-06-05T08:00:00.000Z",
-          "temperatureValue": -8.3,
-          "threshold": -18,
-          "severity": "critical",
-          "status": "pending",
-          "detectedAt": "2026-06-20T10:08:18.948Z",
-          "handledAt": null,
-          "handler": null,
-          "handlingResult": null,
-          "note": null
-        }
-      ]
+      "anomalies": []
     }
   ]
 }
