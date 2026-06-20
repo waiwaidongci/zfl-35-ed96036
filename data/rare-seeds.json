@@ -8,7 +8,19 @@
       "container": "C-冷盒-08",
       "section": "A2",
       "viability": "high",
-      "quantity": 1800,
+      "quantity": 600,
+      "status": "active",
+      "lineage": {
+        "splitFrom": null,
+        "splitTo": [
+          "RS-001-S1-5542",
+          "RS-001-S2-5542",
+          "RS-001-S1-0893",
+          "RS-001-S2-0893"
+        ],
+        "mergedFrom": [],
+        "mergedInto": null
+      },
       "temperatures": [
         {
           "at": "2026-06-01T08:00:00.000Z",
@@ -39,6 +51,22 @@
           "quantity": 1800,
           "balance": 1800,
           "note": "采集入库"
+        },
+        {
+          "id": "TX-1781951205542-qilq",
+          "at": "2026-06-20T10:26:45.542Z",
+          "type": "split_out",
+          "quantity": 1000,
+          "balance": 800,
+          "note": "拆分为 RS-001-S1-5542、RS-001-S2-5542，共拆分 1000 粒"
+        },
+        {
+          "id": "TX-1781951390893-vkr5",
+          "at": "2026-06-20T10:29:50.893Z",
+          "type": "split_out",
+          "quantity": 200,
+          "balance": 600,
+          "note": "拆分为 RS-001-S1-0893、RS-001-S2-0893，共拆分 200 粒"
         }
       ],
       "germinations": [
@@ -61,6 +89,229 @@
           "note": "初步检查种子外观完整，等待萌发实验结果后最终确认"
         }
       ],
+      "anomalies": []
+    },
+    {
+      "id": "RS-001-S1-5542",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-09",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 0,
+      "status": "merged_closed",
+      "lineage": {
+        "splitFrom": "RS-001",
+        "splitTo": [],
+        "mergedFrom": [],
+        "mergedInto": "RS-M-225457"
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951205542-cvdm",
+          "at": "2026-06-20T10:26:45.542Z",
+          "type": "split_in",
+          "quantity": 600,
+          "balance": 600,
+          "note": "从批次 RS-001 拆分子批次，拆分数量 600"
+        },
+        {
+          "id": "TX-1781951225457-tk37",
+          "at": "2026-06-20T10:27:05.457Z",
+          "type": "merge_out",
+          "quantity": 600,
+          "balance": 0,
+          "note": "合并到批次 RS-M-225457，合并数量 600 粒"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "分发给A实验室",
+      "reviews": [],
+      "anomalies": []
+    },
+    {
+      "id": "RS-001-S2-5542",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-10",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 0,
+      "status": "merged_closed",
+      "lineage": {
+        "splitFrom": "RS-001",
+        "splitTo": [],
+        "mergedFrom": [],
+        "mergedInto": "RS-M-225457"
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951205542-kk45",
+          "at": "2026-06-20T10:26:45.542Z",
+          "type": "split_in",
+          "quantity": 400,
+          "balance": 400,
+          "note": "从批次 RS-001 拆分子批次，拆分数量 400"
+        },
+        {
+          "id": "TX-1781951225457-lc8i",
+          "at": "2026-06-20T10:27:05.457Z",
+          "type": "merge_out",
+          "quantity": 400,
+          "balance": 0,
+          "note": "合并到批次 RS-M-225457，合并数量 400 粒"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "分发给B实验室",
+      "reviews": [],
+      "anomalies": []
+    },
+    {
+      "id": "RS-M-225457",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-11",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 1000,
+      "status": "active",
+      "lineage": {
+        "splitFrom": null,
+        "splitTo": [],
+        "mergedFrom": [
+          "RS-001-S1-5542",
+          "RS-001-S2-5542"
+        ],
+        "mergedInto": null
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951225457-efjr",
+          "at": "2026-06-20T10:27:05.457Z",
+          "type": "merge_in",
+          "quantity": 1000,
+          "balance": 1000,
+          "note": "由批次 RS-001-S1-5542、RS-001-S2-5542 合并，合并数量 1000 粒"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "合并后统一管理",
+      "reviews": [],
+      "anomalies": []
+    },
+    {
+      "id": "RS-001-S1-0893",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-12",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 100,
+      "status": "active",
+      "lineage": {
+        "splitFrom": "RS-001",
+        "splitTo": [],
+        "mergedFrom": [],
+        "mergedInto": null
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951390893-etco",
+          "at": "2026-06-20T10:29:50.893Z",
+          "type": "split_in",
+          "quantity": 100,
+          "balance": 100,
+          "note": "从批次 RS-001 拆分子批次，拆分数量 100"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "从批次 RS-001 拆分",
+      "reviews": [],
+      "anomalies": []
+    },
+    {
+      "id": "RS-001-S2-0893",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-13",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 100,
+      "status": "active",
+      "lineage": {
+        "splitFrom": "RS-001",
+        "splitTo": [],
+        "mergedFrom": [],
+        "mergedInto": null
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951390893-qtzr",
+          "at": "2026-06-20T10:29:50.893Z",
+          "type": "split_in",
+          "quantity": 100,
+          "balance": 100,
+          "note": "从批次 RS-001 拆分子批次，拆分数量 100"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "从批次 RS-001 拆分",
+      "reviews": [],
+      "anomalies": []
+    },
+    {
+      "id": "RS-1781951390902",
+      "species": "珙桐",
+      "collectionPlace": "峨眉山",
+      "motherPlant": "MP-99",
+      "container": "C-冷盒-20",
+      "section": "B1",
+      "viability": "unknown",
+      "quantity": 500,
+      "status": "active",
+      "lineage": {
+        "splitFrom": null,
+        "splitTo": [],
+        "mergedFrom": [],
+        "mergedInto": null
+      },
+      "temperatures": [],
+      "transactions": [
+        {
+          "id": "TX-1781951390902",
+          "at": "2026-06-20T10:29:50.902Z",
+          "type": "collect",
+          "quantity": 500,
+          "balance": 500,
+          "note": "新批次入库"
+        }
+      ],
+      "germinations": [],
+      "frozenQuantity": 0,
+      "reservations": [],
+      "remark": "",
+      "reviews": [],
       "anomalies": []
     }
   ]

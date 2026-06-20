@@ -988,3 +988,326 @@ curl -X POST http://localhost:3035/labels/batches/batch \
 | 错误码 | HTTP状态 | 说明 |
 |--------|----------|------|
 | `batch_not_found` | 404 | 批次不存在 |
+
+## 批次拆分与合并模块
+
+支持将一个批次拆分为多个子批次，也支持将同物种、同采集地、同母株的多个批次合并为一个新批次。拆分和合并都会写入库存流水，并保留来源批次与目标批次的谱系关系。库存报告自动排除已合并关闭的批次，避免重复统计。
+
+### 核心概念
+
+- **批次状态（status）**：
+  - `active`：正常活跃，可进行正常出入库操作
+  - `split_closed`：拆分后已无剩余数量的来源批次
+  - `merged_closed`：已被合并的来源批次，不再参与库存统计
+- **谱系关系（lineage）**：
+  - `splitFrom`：拆分来源批次ID（仅子批次有值）
+  - `splitTo`：拆分出的子批次ID数组（仅来源批次有值）
+  - `mergedFrom`：合并来源批次ID数组（仅合并目标批次有值）
+  - `mergedInto`：合并到的目标批次ID（仅被合并的来源批次有值）
+- **交易类型**：
+  - `split_out`：拆出，来源批次库存减少
+  - `split_in`：拆入，子批次库存增加
+  - `merge_out`：合并出，来源批次库存清零并关闭
+  - `merge_in`：合并入，目标批次库存增加
+- 已合并关闭（`merged_closed`）的批次不参与库存报告统计
+
+### 接口一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/batches/:id/split` | 将一个批次拆分为多个子批次 |
+| POST | `/batches/merge` | 合并多个批次为一个新批次 |
+| GET | `/batches/:id` | 批次详情（含 `status` 和 `lineage` 谱系信息） |
+| GET | `/batches?status=` | 按批次状态筛选列表 |
+| GET | `/reports/inventory` | 库存报告（排除已合并关闭的批次） |
+
+### 数据结构
+
+#### 批次字段新增
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `status` | string | 批次状态：`active`/`split_closed`/`merged_closed` |
+| `lineage` | object | 谱系关系对象 |
+| `lineage.splitFrom` | string\|null | 拆分来源批次ID |
+| `lineage.splitTo` | string[] | 拆分出的子批次ID数组 |
+| `lineage.mergedFrom` | string[] | 合并来源批次ID数组 |
+| `lineage.mergedInto` | string\|null | 合并到的目标批次ID |
+
+### 接口详情
+
+#### POST `/batches/:id/split` — 拆分批次
+
+将一个活跃批次拆分为多个子批次。每个子批次必须指定存放位置（container 和 section）。来源批次剩余数量为 0 时自动标记为 `split_closed`。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `items` | array | 是 | 子批次定义数组，至少2项 |
+| `items[].quantity` | number | 是 | 该子批次拆分数量，必须大于0 |
+| `items[].container` | string | 是 | 子批次存放冷盒编号 |
+| `items[].section` | string | 是 | 子批次所属分区 |
+| `items[].id` | string | 否 | 自定义子批次ID，默认自动生成 |
+| `items[].remark` | string | 否 | 子批次备注 |
+
+**约束：**
+- 拆分总数量不能超过来源批次的可用库存（实际库存 - 冻结库存）
+- 来源批次必须处于 `active` 状态
+- 所有子批次会继承来源批次的物种、采集地、母株、活性等级
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/RS-001/split \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      { "quantity": 600, "container": "C-冷盒-09", "section": "A2", "remark": "分发给A实验室" },
+      { "quantity": 400, "container": "C-冷盒-10", "section": "A2", "remark": "分发给B实验室" }
+    ]
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "sourceBatch": {
+    "id": "RS-001",
+    "quantity": 800,
+    "status": "active",
+    "transaction": {
+      "id": "TX-1718888888888-abcd",
+      "at": "2026-06-20T10:00:00.000Z",
+      "type": "split_out",
+      "quantity": 1000,
+      "balance": 800,
+      "note": "拆分为 RS-001-S1-8888、RS-001-S2-8888，共拆分 1000 粒"
+    }
+  },
+  "childBatches": [
+    {
+      "id": "RS-001-S1-8888",
+      "quantity": 600,
+      "container": "C-冷盒-09",
+      "section": "A2",
+      "transaction": {
+        "id": "TX-1718888888889-wxyz",
+        "at": "2026-06-20T10:00:00.000Z",
+        "type": "split_in",
+        "quantity": 600,
+        "balance": 600,
+        "note": "从批次 RS-001 拆分子批次，拆分数量 600"
+      }
+    },
+    {
+      "id": "RS-001-S2-8888",
+      "quantity": 400,
+      "container": "C-冷盒-10",
+      "section": "A2",
+      "transaction": {
+        "id": "TX-1718888888890-pqrs",
+        "at": "2026-06-20T10:00:00.000Z",
+        "type": "split_in",
+        "quantity": 400,
+        "balance": 400,
+        "note": "从批次 RS-001 拆分子批次，拆分数量 400"
+      }
+    }
+  ]
+}
+```
+
+#### POST `/batches/merge` — 合并批次
+
+将多个同物种、同采集地、同母株的活跃批次合并为一个新批次。来源批次会被标记为 `merged_closed` 且库存清零，不再参与库存统计。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `batchIds` | string[] | 是 | 要合并的来源批次ID数组，至少2项 |
+| `target` | object | 是 | 目标批次信息 |
+| `target.container` | string | 是 | 目标批次存放冷盒编号 |
+| `target.section` | string | 是 | 目标批次所属分区 |
+| `target.id` | string | 否 | 自定义目标批次ID，默认自动生成 `RS-M-xxxxxx` |
+| `target.remark` | string | 否 | 目标批次备注 |
+
+**约束：**
+- 所有来源批次必须处于 `active` 状态
+- 所有来源批次必须具有相同的 `species`、`collectionPlace`、`motherPlant`
+- 合并后目标批次继承来源批次的物种、采集地、母株、活性等级
+- 来源批次的冻结库存会一并合并到目标批次
+
+**请求示例：**
+
+```bash
+curl -X POST http://localhost:3035/batches/merge \
+  -H "Content-Type: application/json" \
+  -d '{
+    "batchIds": ["RS-001-S1-8888", "RS-001-S2-8888"],
+    "target": {
+      "container": "C-冷盒-11",
+      "section": "A2",
+      "remark": "合并后统一管理"
+    }
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "targetBatch": {
+    "id": "RS-M-888888",
+    "quantity": 1000,
+    "frozenQuantity": 0,
+    "container": "C-冷盒-11",
+    "section": "A2",
+    "transaction": {
+      "id": "TX-1718888889000-merge",
+      "at": "2026-06-20T11:00:00.000Z",
+      "type": "merge_in",
+      "quantity": 1000,
+      "balance": 1000,
+      "note": "由批次 RS-001-S1-8888、RS-001-S2-8888 合并，合并数量 1000 粒"
+    },
+    "mergedFrom": ["RS-001-S1-8888", "RS-001-S2-8888"]
+  },
+  "sourceBatches": [
+    {
+      "batchId": "RS-001-S1-8888",
+      "transaction": {
+        "id": "TX-1718888889001-out1",
+        "at": "2026-06-20T11:00:00.000Z",
+        "type": "merge_out",
+        "quantity": 600,
+        "balance": 0,
+        "note": "合并到批次 RS-M-888888，合并数量 600 粒"
+      }
+    },
+    {
+      "batchId": "RS-001-S2-8888",
+      "transaction": {
+        "id": "TX-1718888889002-out2",
+        "at": "2026-06-20T11:00:00.000Z",
+        "type": "merge_out",
+        "quantity": 400,
+        "balance": 0,
+        "note": "合并到批次 RS-M-888888，合并数量 400 粒"
+      }
+    }
+  ]
+}
+```
+
+#### GET `/batches/:id` — 批次详情（含谱系信息）
+
+批次详情接口现在包含 `status` 和 `lineage` 字段，可查看该批次的来源和去向。
+
+**响应示例（拆分后的来源批次）：**
+
+```json
+{
+  "id": "RS-001",
+  "species": "独叶草",
+  "quantity": 800,
+  "status": "active",
+  "lineage": {
+    "splitFrom": null,
+    "splitTo": ["RS-001-S1-8888", "RS-001-S2-8888"],
+    "mergedFrom": [],
+    "mergedInto": null
+  },
+  "transactions": [
+    { "type": "collect", ... },
+    { "type": "split_out", "quantity": 1000, "balance": 800, ... }
+  ],
+  ...
+}
+```
+
+**响应示例（子批次）：**
+
+```json
+{
+  "id": "RS-001-S1-8888",
+  "species": "独叶草",
+  "quantity": 600,
+  "status": "active",
+  "lineage": {
+    "splitFrom": "RS-001",
+    "splitTo": [],
+    "mergedFrom": [],
+    "mergedInto": null
+  },
+  ...
+}
+```
+
+**响应示例（已合并关闭的来源批次）：**
+
+```json
+{
+  "id": "RS-001-S1-8888",
+  "quantity": 0,
+  "status": "merged_closed",
+  "lineage": {
+    "splitFrom": "RS-001",
+    "splitTo": [],
+    "mergedFrom": [],
+    "mergedInto": "RS-M-888888"
+  },
+  ...
+}
+```
+
+#### GET `/reports/inventory` — 库存报告（更新）
+
+库存报告现在排除 `merged_closed` 状态的批次，避免重复统计。新增 `mergedClosedBatches` 和 `totalBatchesAll` 字段用于参考。
+
+**响应示例（新增字段）：**
+
+```json
+{
+  "total": 1800,
+  "totalBatches": 2,
+  "totalBatchesAll": 4,
+  "mergedClosedBatches": 2,
+  "lowStock": [
+    {
+      "id": "RS-M-888888",
+      "species": "独叶草",
+      "quantity": 1000,
+      "frozenQuantity": 0,
+      "availableQuantity": 1000,
+      "status": "active"
+    }
+  ],
+  ...
+}
+```
+
+新增字段说明：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `totalBatches` | number | 参与统计的活跃批次数量（排除 merged_closed） |
+| `totalBatchesAll` | number | 所有批次总数（含已关闭） |
+| `mergedClosedBatches` | number | 已合并关闭的批次数量 |
+| `lowStock[].status` | string | 批次状态 |
+
+### 错误码
+
+| 错误码 | HTTP状态 | 说明 |
+|--------|----------|------|
+| `batch_not_found` | 404 | 批次不存在，合并时返回缺失ID列表 |
+| `batch_not_active` | 409 | 批次状态不是 active，无法拆分/合并 |
+| `invalid_split_items` | 409 | 拆分项无效（至少需要2个子批次） |
+| `invalid_quantity` | 400/409 | 数量无效（小于等于0） |
+| `insufficient_available_quantity` | 409 | 可用库存不足 |
+| `missing_container_or_section` | 409 | 缺少 container 或 section |
+| `batch_id_conflict` | 409 | 自定义批次ID已存在 |
+| `insufficient_batches` | 409 | 合并至少需要2个批次 |
+| `merge_mismatch` | 409 | 合并批次必须同物种、同采集地、同母株 |
