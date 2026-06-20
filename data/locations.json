@@ -1,0 +1,86 @@
+{
+  "sections": [
+    {
+      "id": "A1",
+      "name": "A1极低温区",
+      "boxes": [
+        {
+          "id": "C-冷盒-01",
+          "name": "冷盒01",
+          "slotCapacity": 20,
+          "slots": []
+        },
+        {
+          "id": "C-冷盒-02",
+          "name": "冷盒02",
+          "slotCapacity": 20,
+          "slots": []
+        }
+      ]
+    },
+    {
+      "id": "A2",
+      "name": "A2低温区",
+      "boxes": [
+        {
+          "id": "C-冷盒-07",
+          "name": "冷盒07",
+          "slotCapacity": 16,
+          "slots": []
+        },
+        {
+          "id": "C-冷盒-08",
+          "name": "冷盒08",
+          "slotCapacity": 16,
+          "slots": [
+            {
+              "index": 1,
+              "batchId": "RS-001"
+            },
+            {
+              "index": 2,
+              "batchId": null
+            },
+            {
+              "index": 3,
+              "batchId": null
+            },
+            {
+              "index": 4,
+              "batchId": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B1",
+      "name": "B1中温区",
+      "boxes": [
+        {
+          "id": "C-冷盒-15",
+          "name": "冷盒15",
+          "slotCapacity": 24,
+          "slots": []
+        }
+      ]
+    },
+    {
+      "id": "C1",
+      "name": "C1恒温区",
+      "boxes": [
+        {
+          "id": "C-冷盒-30",
+          "name": "冷盒30",
+          "slotCapacity": 12,
+          "slots": [
+            {
+              "index": 1,
+              "batchId": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
