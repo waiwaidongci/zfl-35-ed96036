@@ -1,12 +1,21 @@
 import * as store from "../lib/location-store.js";
+import { getRequestContext } from "../lib/data-store.js";
+
+function makeCtx(req, input = {}) {
+  const headers = req.headers || {};
+  return {
+    operator: input.operator || headers["x-operator"] || headers["x-user"] || null,
+    source: getRequestContext(req)
+  };
+}
 
 const routes = [
   { method: "GET", pattern: /^\/locations\/sections$/, handler: async () => store.listSections() },
-  { method: "POST", pattern: /^\/locations\/sections$/, handler: async (_req, _res, body) => store.createSection(body) },
+  { method: "POST", pattern: /^\/locations\/sections$/, handler: async (req, _res, body) => store.createSection(body, makeCtx(req, body)) },
   { method: "GET", pattern: /^\/locations\/sections\/([^/]+)\/free-slots$/, handler: async (_req, _res, _body, params) => store.listFreeSlots(params[1]) },
   { method: "GET", pattern: /^\/locations\/sections\/([^/]+)$/, handler: async (_req, _res, _body, params) => store.getSection(params[1]) },
-  { method: "POST", pattern: /^\/locations\/sections\/([^/]+)\/boxes$/, handler: async (_req, _res, body, params) => store.addBox(params[1], body) },
-  { method: "PATCH", pattern: /^\/locations\/boxes\/([^/]+)\/slots\/(\d+)$/, handler: async (_req, _res, body, params) => store.assignSlot(params[1], params[2], body.batchId) },
+  { method: "POST", pattern: /^\/locations\/sections\/([^/]+)\/boxes$/, handler: async (req, _res, body, params) => store.addBox(params[1], body, makeCtx(req, body)) },
+  { method: "PATCH", pattern: /^\/locations\/boxes\/([^/]+)\/slots\/(\d+)$/, handler: async (req, _res, body, params) => store.assignSlot(params[1], params[2], body.batchId, makeCtx(req, body)) },
   { method: "GET", pattern: /^\/locations\/boxes\/([^/]+)$/, handler: async (_req, _res, _body, params) => store.getBox(params[1]) },
   { method: "GET", pattern: /^\/locations\/batches\/([^/]+)\/slots$/, handler: async (_req, _res, _body, params) => store.getBatchLocations(params[1]) },
 ];
