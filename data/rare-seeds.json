@@ -1,0 +1,38 @@
+{
+  "batches": [
+    {
+      "id": "RS-001",
+      "species": "独叶草",
+      "collectionPlace": "西岭北坡",
+      "motherPlant": "MP-17",
+      "container": "C-冷盒-08",
+      "section": "A2",
+      "viability": "high",
+      "quantity": 1800,
+      "temperatures": [
+        {
+          "at": "2026-06-01T08:00:00.000Z",
+          "value": -18.4
+        }
+      ],
+      "transactions": [
+        {
+          "id": "TX-1",
+          "at": "2026-05-20",
+          "type": "collect",
+          "quantity": 1800,
+          "balance": 1800,
+          "note": "采集入库"
+        }
+      ],
+      "germinations": [
+        {
+          "at": "2026-06-12",
+          "sampled": 100,
+          "sprouted": 72,
+          "rate": 0.72
+        }
+      ]
+    }
+  ]
+}
