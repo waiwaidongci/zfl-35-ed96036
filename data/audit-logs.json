@@ -1,6 +1,6 @@
 {
-  "_version": 19,
-  "_updatedAt": "2026-06-21T10:03:50.296Z",
+  "_version": 42,
+  "_updatedAt": "2026-06-21T10:17:51.082Z",
   "_dataType": "audit-logs",
   "data": {
     "logs": [
@@ -967,6 +967,1324 @@
           "mutatorError": {
             "error": "missing_merge_target",
             "message": "合并模式必须指定 mergeTargetBatchId"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036677140-7pob20",
+        "timestamp": "2026-06-21T10:11:17.140Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 19
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "insufficient_batches",
+            "message": "合并至少需要2个批次"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036677149-7j1o2x",
+        "timestamp": "2026-06-21T10:11:17.149Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-NOTEXIST"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 20
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "batch_not_found",
+            "missingIds": [
+              "RS-NOTEXIST"
+            ]
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036677158-zu7amq",
+        "timestamp": "2026-06-21T10:11:17.158Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-002"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 21
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_mismatch",
+            "message": "合并批次必须同物种、同采集地、同母株",
+            "fields": {
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17"
+            },
+            "mismatchedBatch": "RS-002"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036677166-nktg54",
+        "timestamp": "2026-06-21T10:11:17.166Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-002"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 22
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_mismatch",
+            "message": "合并批次必须同物种、同采集地、同母株",
+            "fields": {
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17"
+            },
+            "mismatchedBatch": "RS-002"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036677175-av281s",
+        "timestamp": "2026-06-21T10:11:17.175Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-003"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 23
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_mismatch",
+            "message": "合并批次必须同物种、同采集地、同母株",
+            "fields": {
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17"
+            },
+            "mismatchedBatch": "RS-003"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036692362-jlhvq2",
+        "timestamp": "2026-06-21T10:11:32.362Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:01:59.052Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:11:32.362Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": null,
+            "auditVersion": 24
+          },
+          "after": {
+            "dataVersion": 14,
+            "locVersion": null,
+            "auditVersion": 24
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716119-mduzgp",
+        "timestamp": "2026-06-21T10:11:56.119Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/RS-001/split"
+        },
+        "operation": "batch_split",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001",
+          "RS-001-S1-6118",
+          "RS-001-S2-6119"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:11:32.362Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            },
+            "RS-001-S1-6118": null,
+            "RS-001-S2-6119": null
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:11:32.362Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            },
+            "RS-001-S1-6118": {
+              "id": "RS-001-S1-6118",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-A",
+              "section": "A1",
+              "viability": "high",
+              "quantity": 500,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "从批次 RS-001 拆分",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            },
+            "RS-001-S2-6119": {
+              "id": "RS-001-S2-6119",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-B",
+              "section": "A1",
+              "viability": "high",
+              "quantity": 500,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "从批次 RS-001 拆分",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "sourceBatch": {
+            "id": "RS-001",
+            "quantityAfter": 800,
+            "statusAfter": "active",
+            "transaction": {
+              "id": "TX-1782036716119-71un",
+              "at": "2026-06-21T10:11:56.119Z",
+              "type": "split_out",
+              "quantity": 1000,
+              "balance": 800,
+              "note": "拆分为 RS-001-S1-6118、RS-001-S2-6119，共拆分 1000 粒"
+            },
+            "splitToIds": [
+              "RS-001-S1-6118",
+              "RS-001-S2-6119"
+            ]
+          },
+          "childBatches": [
+            {
+              "id": "RS-001-S1-6118",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17",
+              "container": "C-A",
+              "section": "A1",
+              "viability": "high",
+              "quantity": 500,
+              "status": "active",
+              "lineage": {
+                "splitFrom": "RS-001",
+                "splitTo": [],
+                "mergedFrom": [],
+                "mergedInto": null
+              },
+              "temperatures": [],
+              "transactions": [
+                {
+                  "id": "TX-1782036716118-9tel",
+                  "at": "2026-06-21T10:11:56.118Z",
+                  "type": "split_in",
+                  "quantity": 500,
+                  "balance": 500,
+                  "note": "从批次 RS-001 拆分子批次，拆分数量 500"
+                }
+              ],
+              "germinations": [],
+              "frozenQuantity": 0,
+              "reservations": [],
+              "remark": "从批次 RS-001 拆分",
+              "reviews": [],
+              "anomalies": []
+            },
+            {
+              "id": "RS-001-S2-6119",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17",
+              "container": "C-B",
+              "section": "A1",
+              "viability": "high",
+              "quantity": 500,
+              "status": "active",
+              "lineage": {
+                "splitFrom": "RS-001",
+                "splitTo": [],
+                "mergedFrom": [],
+                "mergedInto": null
+              },
+              "temperatures": [],
+              "transactions": [
+                {
+                  "id": "TX-1782036716119-8qns",
+                  "at": "2026-06-21T10:11:56.119Z",
+                  "type": "split_in",
+                  "quantity": 500,
+                  "balance": 500,
+                  "note": "从批次 RS-001 拆分子批次，拆分数量 500"
+                }
+              ],
+              "germinations": [],
+              "frozenQuantity": 0,
+              "reservations": [],
+              "remark": "从批次 RS-001 拆分",
+              "reviews": [],
+              "anomalies": []
+            }
+          ]
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 14,
+            "locVersion": 2,
+            "auditVersion": 25
+          },
+          "after": {
+            "dataVersion": 15,
+            "locVersion": 3,
+            "auditVersion": 25
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716236-8d08np",
+        "timestamp": "2026-06-21T10:11:56.236Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "",
+          ""
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 15,
+            "locVersion": 3,
+            "auditVersion": 26
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "batch_not_found",
+            "missingIds": [
+              "",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716246-iuyl42",
+        "timestamp": "2026-06-21T10:11:56.246Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /sites"
+        },
+        "operation": "version_conflict",
+        "entityType": "site",
+        "entityId": "SITE-TEST",
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 15,
+            "locVersion": null,
+            "auditVersion": 27
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "site_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "site_already_exists",
+            "id": "SITE-TEST"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716287-4lma9k",
+        "timestamp": "2026-06-21T10:11:56.287Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036716287"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782036716287": null
+          },
+          "after": {
+            "RS-1782036716287": {
+              "id": "RS-1782036716287",
+              "siteId": "SITE-TEST",
+              "species": "测试种",
+              "collectionPlace": "测试地",
+              "container": "C-1",
+              "section": "A1",
+              "viability": "unknown",
+              "quantity": 100,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782036716287",
+            "siteId": "SITE-TEST",
+            "species": "测试种",
+            "collectionPlace": "测试地",
+            "motherPlant": "MP-TEST",
+            "container": "C-1",
+            "section": "A1",
+            "viability": "unknown",
+            "quantity": 100,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782036716287",
+                "at": "2026-06-21T10:11:56.287Z",
+                "type": "collect",
+                "quantity": 100,
+                "balance": 100,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 15,
+            "locVersion": null,
+            "auditVersion": 28
+          },
+          "after": {
+            "dataVersion": 16,
+            "locVersion": null,
+            "auditVersion": 28
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716329-pykpi7",
+        "timestamp": "2026-06-21T10:11:56.329Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036716329"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782036716329": null
+          },
+          "after": {
+            "RS-1782036716329": {
+              "id": "RS-1782036716329",
+              "siteId": "SITE-001",
+              "species": "测试种",
+              "collectionPlace": "测试地",
+              "container": "C-2",
+              "section": "A1",
+              "viability": "unknown",
+              "quantity": 100,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782036716329",
+            "siteId": "SITE-001",
+            "species": "测试种",
+            "collectionPlace": "测试地",
+            "motherPlant": "MP-TEST",
+            "container": "C-2",
+            "section": "A1",
+            "viability": "unknown",
+            "quantity": 100,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782036716329",
+                "at": "2026-06-21T10:11:56.329Z",
+                "type": "collect",
+                "quantity": 100,
+                "balance": 100,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 16,
+            "locVersion": null,
+            "auditVersion": 29
+          },
+          "after": {
+            "dataVersion": 17,
+            "locVersion": null,
+            "auditVersion": 29
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036716377-31pqfi",
+        "timestamp": "2026-06-21T10:11:56.377Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036716329",
+          "RS-1782036716287"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 17,
+            "locVersion": 3,
+            "auditVersion": 30
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_site_mismatch",
+            "message": "合并批次必须来自同一站点",
+            "batchSite": "SITE-TEST",
+            "expectedSite": "SITE-001"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036734142-z6h1eg",
+        "timestamp": "2026-06-21T10:12:14.142Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036734141"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782036734141": null
+          },
+          "after": {
+            "RS-1782036734141": {
+              "id": "RS-1782036734141",
+              "siteId": "SITE-001",
+              "species": "测试合并种",
+              "collectionPlace": "测试地",
+              "container": "C-1",
+              "section": "A1",
+              "viability": "unknown",
+              "quantity": 100,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782036734141",
+            "siteId": "SITE-001",
+            "species": "测试合并种",
+            "collectionPlace": "测试地",
+            "motherPlant": "MP-1",
+            "container": "C-1",
+            "section": "A1",
+            "viability": "unknown",
+            "quantity": 100,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782036734141",
+                "at": "2026-06-21T10:12:14.141Z",
+                "type": "collect",
+                "quantity": 100,
+                "balance": 100,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 17,
+            "locVersion": null,
+            "auditVersion": 31
+          },
+          "after": {
+            "dataVersion": 18,
+            "locVersion": null,
+            "auditVersion": 31
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036734173-fb8sq7",
+        "timestamp": "2026-06-21T10:12:14.173Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036734173"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782036734173": null
+          },
+          "after": {
+            "RS-1782036734173": {
+              "id": "RS-1782036734173",
+              "siteId": "SITE-001",
+              "species": "测试合并种",
+              "collectionPlace": "测试地",
+              "container": "C-2",
+              "section": "A1",
+              "viability": "unknown",
+              "quantity": 200,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782036734173",
+            "siteId": "SITE-001",
+            "species": "测试合并种",
+            "collectionPlace": "测试地",
+            "motherPlant": "MP-1",
+            "container": "C-2",
+            "section": "A1",
+            "viability": "unknown",
+            "quantity": 200,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782036734173",
+                "at": "2026-06-21T10:12:14.173Z",
+                "type": "collect",
+                "quantity": 200,
+                "balance": 200,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 18,
+            "locVersion": null,
+            "auditVersion": 32
+          },
+          "after": {
+            "dataVersion": 19,
+            "locVersion": null,
+            "auditVersion": 32
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036734200-oqas0c",
+        "timestamp": "2026-06-21T10:12:14.200Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036734141",
+          "RS-1782036734173"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 19,
+            "locVersion": 3,
+            "auditVersion": 33
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "incomplete_slot_params",
+            "message": "目标批次：boxId 和 slotIndex 必须同时传入或同时不传，不能只传一个",
+            "provided": "仅 boxId",
+            "hint": "如需指定目标库位，请同时传入 boxId 和 slotIndex；否则两个参数都不要传"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036734209-97k4s6",
+        "timestamp": "2026-06-21T10:12:14.209Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036734141",
+          "RS-1782036734173"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 19,
+            "locVersion": 3,
+            "auditVersion": 34
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "missing_container_or_section",
+            "message": "目标批次必须指定 container 和 section"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036734220-d3fitv",
+        "timestamp": "2026-06-21T10:12:14.220Z",
+        "operator": "test",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782036734141",
+          "RS-1782036734173"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 19,
+            "locVersion": 3,
+            "auditVersion": 35
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "batch_id_conflict",
+            "id": "RS-1782036734141"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036748826-kjlg6w",
+        "timestamp": "2026-06-21T10:12:28.826Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:11:32.362Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:12:28.826Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 19,
+            "locVersion": null,
+            "auditVersion": 36
+          },
+          "after": {
+            "dataVersion": 20,
+            "locVersion": null,
+            "auditVersion": 36
+          }
+        }
+      },
+      {
+        "id": "AUD-1782037027055-m61fp2",
+        "timestamp": "2026-06-21T10:17:07.055Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:12:28.826Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:17:07.053Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 20,
+            "locVersion": null,
+            "auditVersion": 37
+          },
+          "after": {
+            "dataVersion": 21,
+            "locVersion": null,
+            "auditVersion": 37
+          }
+        }
+      },
+      {
+        "id": "AUD-1782037071023-c5hp5w",
+        "timestamp": "2026-06-21T10:17:51.023Z",
+        "operator": "verify",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-004"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 21,
+            "locVersion": 3,
+            "auditVersion": 38
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_site_mismatch",
+            "message": "合并批次必须来自同一站点",
+            "batchSite": "SITE-002",
+            "expectedSite": "SITE-001"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782037071026-qvplyj",
+        "timestamp": "2026-06-21T10:17:51.026Z",
+        "operator": "verify",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-NOTEXIST"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 21,
+            "locVersion": 3,
+            "auditVersion": 39
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "batch_not_found",
+            "missingIds": [
+              "RS-NOTEXIST"
+            ]
+          }
+        }
+      },
+      {
+        "id": "AUD-1782037071077-5w3dhs",
+        "timestamp": "2026-06-21T10:17:51.077Z",
+        "operator": "verify",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 21,
+            "locVersion": 3,
+            "auditVersion": 40
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "insufficient_batches",
+            "message": "合并至少需要2个批次"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782037071081-qqyrhe",
+        "timestamp": "2026-06-21T10:17:51.081Z",
+        "operator": "verify",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-002"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 21,
+            "locVersion": 3,
+            "auditVersion": 41
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_mismatch",
+            "message": "合并批次必须同物种、同采集地、同母株",
+            "fields": {
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "motherPlant": "MP-17"
+            },
+            "mismatchedBatch": "RS-002"
           }
         }
       }

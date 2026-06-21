@@ -26,36 +26,6 @@ function parseRetestOptions(url) {
 const routes = [
   {
     method: "GET",
-    pattern: /^\/reports\/viability-risk$/,
-    handler: async (req) => {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      const options = parseRetestOptions(url);
-      const siteId = url.searchParams.get("siteId") || null;
-      return viabilityStore.generateRetestPlanReport(options, siteId);
-    }
-  },
-  {
-    method: "GET",
-    pattern: /^\/reports\/retest-plan$/,
-    handler: async (req) => {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      const options = parseRetestOptions(url);
-      const siteId = url.searchParams.get("siteId") || null;
-      return viabilityStore.generateRetestPlanReport(options, siteId);
-    }
-  },
-  {
-    method: "GET",
-    pattern: /^\/reports\/retest-batches$/,
-    handler: async (req) => {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      const options = parseRetestOptions(url);
-      const siteId = url.searchParams.get("siteId") || null;
-      return viabilityStore.getRetestBatchList(options, siteId);
-    }
-  },
-  {
-    method: "GET",
     pattern: /^\/batches\/([^/]+)\/viability$/,
     handler: async (req, _res, _body, params) => {
       const url = new URL(req.url, `http://${req.headers.host}`);
