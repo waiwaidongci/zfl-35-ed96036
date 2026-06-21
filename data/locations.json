@@ -29,7 +29,8 @@
           "slotCapacity": 20,
           "slots": []
         }
-      ]
+      ],
+      "temperatureThreshold": null
     },
     {
       "id": "A2",
@@ -65,7 +66,8 @@
             }
           ]
         }
-      ]
+      ],
+      "temperatureThreshold": -19
     },
     {
       "id": "A3",
@@ -78,7 +80,8 @@
           "slotCapacity": 16,
           "slots": []
         }
-      ]
+      ],
+      "temperatureThreshold": null
     },
     {
       "id": "B1",
@@ -91,7 +94,8 @@
           "slotCapacity": 24,
           "slots": []
         }
-      ]
+      ],
+      "temperatureThreshold": null
     },
     {
       "id": "C1",
@@ -109,7 +113,8 @@
             }
           ]
         }
-      ]
+      ],
+      "temperatureThreshold": null
     },
     {
       "id": "A1-BK",
@@ -128,7 +133,8 @@
           "slotCapacity": 20,
           "slots": []
         }
-      ]
+      ],
+      "temperatureThreshold": null
     },
     {
       "id": "A3-BK",
@@ -141,7 +147,8 @@
           "slotCapacity": 16,
           "slots": []
         }
-      ]
+      ],
+      "temperatureThreshold": null
     }
   ]
 }

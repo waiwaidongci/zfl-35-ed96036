@@ -1,3 +1,533 @@
 {
-  "logs": []
+  "logs": [
+    {
+      "id": "AUD-1782020730044-p6ly76",
+      "timestamp": "2026-06-21T05:45:30.044Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/site/SITE-001"
+      },
+      "operation": "temperature_threshold_site_update",
+      "entityType": "site",
+      "entityId": "SITE-001",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "siteId": "SITE-001",
+        "thresholdBefore": -20,
+        "thresholdAfter": -20
+      }
+    },
+    {
+      "id": "AUD-1782020738651-7ur9da",
+      "timestamp": "2026-06-21T05:45:38.651Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/section/A2"
+      },
+      "operation": "temperature_threshold_section_update",
+      "entityType": "section",
+      "entityId": "A2",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "sectionId": "A2",
+        "threshold": -19
+      }
+    },
+    {
+      "id": "AUD-1782020749107-rgq2a8",
+      "timestamp": "2026-06-21T05:45:49.107Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /anomalies/scan"
+      },
+      "operation": "anomaly_scan",
+      "entityType": "anomaly",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1800,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1800,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "newAnomalies": [
+          {
+            "id": "ANOM-1782020749107-gk58e2",
+            "batchId": "RS-001",
+            "temperatureAt": "2026-06-01T08:00:00.000Z",
+            "temperatureValue": -18.4,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:45:49.107Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020749107-cu6ute",
+            "batchId": "RS-001",
+            "temperatureAt": "2026-06-02T08:00:00.000Z",
+            "temperatureValue": -17.2,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:45:49.107Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020749107-6rgmp6",
+            "batchId": "RS-001",
+            "temperatureAt": "2026-06-03T08:00:00.000Z",
+            "temperatureValue": -12.5,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "warning",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:45:49.107Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020749107-rcjbgg",
+            "batchId": "RS-001",
+            "temperatureAt": "2026-06-05T08:00:00.000Z",
+            "temperatureValue": -8.3,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "critical",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:45:49.107Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "AUD-1782020782800-sjiinp",
+      "timestamp": "2026-06-21T05:46:22.800Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /anomalies/scan"
+      },
+      "operation": "anomaly_scan",
+      "entityType": "anomaly",
+      "entityId": null,
+      "affectedBatches": [
+        "RS-002",
+        "RS-003",
+        "RS-005"
+      ],
+      "changes": {
+        "before": {
+          "RS-002": {
+            "id": "RS-002",
+            "siteId": "SITE-001",
+            "species": "珙桐",
+            "collectionPlace": "峨眉山",
+            "container": "C-冷盒-09",
+            "section": "A2",
+            "viability": "medium",
+            "quantity": 950,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "珙桐种子，注意观察活性变化趋势",
+            "transactionsCount": 2,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          },
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          },
+          "RS-005": {
+            "id": "RS-005",
+            "siteId": "SITE-002",
+            "species": "水杉",
+            "collectionPlace": "湖北利川",
+            "container": "C-冷盒-12",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "水杉种子，已超过90天未复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 1,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          }
+        },
+        "after": {
+          "RS-002": {
+            "id": "RS-002",
+            "siteId": "SITE-001",
+            "species": "珙桐",
+            "collectionPlace": "峨眉山",
+            "container": "C-冷盒-09",
+            "section": "A2",
+            "viability": "medium",
+            "quantity": 950,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "珙桐种子，注意观察活性变化趋势",
+            "transactionsCount": 2,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          },
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          },
+          "RS-005": {
+            "id": "RS-005",
+            "siteId": "SITE-002",
+            "species": "水杉",
+            "collectionPlace": "湖北利川",
+            "container": "C-冷盒-12",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "水杉种子，已超过90天未复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 1,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 1
+          }
+        }
+      },
+      "details": {
+        "newAnomalies": [
+          {
+            "id": "ANOM-1782020782800-rb8kbu",
+            "batchId": "RS-002",
+            "temperatureAt": "2026-06-01T08:00:00.000Z",
+            "temperatureValue": -18.2,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-rk5o9t",
+            "batchId": "RS-002",
+            "temperatureAt": "2026-06-02T08:00:00.000Z",
+            "temperatureValue": -18,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-lryeun",
+            "batchId": "RS-002",
+            "temperatureAt": "2026-06-03T08:00:00.000Z",
+            "temperatureValue": -18.5,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-k4sv13",
+            "batchId": "RS-002",
+            "temperatureAt": "2026-06-04T08:00:00.000Z",
+            "temperatureValue": -18.1,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-ddiy4a",
+            "batchId": "RS-002",
+            "temperatureAt": "2026-06-05T08:00:00.000Z",
+            "temperatureValue": -18.3,
+            "threshold": -19,
+            "thresholdSource": "section",
+            "thresholdSourceId": "A2",
+            "thresholdSourceName": "A2低温区",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-yp01bw",
+            "batchId": "RS-003",
+            "temperatureAt": "2026-06-01T08:00:00.000Z",
+            "temperatureValue": -18,
+            "threshold": -20,
+            "thresholdSource": "site",
+            "thresholdSourceId": "SITE-001",
+            "thresholdSourceName": "主冷库",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-mng0kd",
+            "batchId": "RS-003",
+            "temperatureAt": "2026-06-02T08:00:00.000Z",
+            "temperatureValue": -17.9,
+            "threshold": -20,
+            "thresholdSource": "site",
+            "thresholdSourceId": "SITE-001",
+            "thresholdSourceName": "主冷库",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-jx2ixk",
+            "batchId": "RS-003",
+            "temperatureAt": "2026-06-03T08:00:00.000Z",
+            "temperatureValue": -18.1,
+            "threshold": -20,
+            "thresholdSource": "site",
+            "thresholdSourceId": "SITE-001",
+            "thresholdSourceName": "主冷库",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-v094nb",
+            "batchId": "RS-003",
+            "temperatureAt": "2026-06-04T08:00:00.000Z",
+            "temperatureValue": -18.2,
+            "threshold": -20,
+            "thresholdSource": "site",
+            "thresholdSourceId": "SITE-001",
+            "thresholdSourceName": "主冷库",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-fh5anb",
+            "batchId": "RS-003",
+            "temperatureAt": "2026-06-05T08:00:00.000Z",
+            "temperatureValue": -18,
+            "threshold": -20,
+            "thresholdSource": "site",
+            "thresholdSourceId": "SITE-001",
+            "thresholdSourceName": "主冷库",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          },
+          {
+            "id": "ANOM-1782020782800-5y7t1n",
+            "batchId": "RS-005",
+            "temperatureAt": "2026-06-03T08:00:00.000Z",
+            "temperatureValue": -17.8,
+            "threshold": -18,
+            "thresholdSource": "default",
+            "thresholdSourceId": null,
+            "thresholdSourceName": "系统默认",
+            "severity": "abnormal",
+            "status": "pending",
+            "detectedAt": "2026-06-21T05:46:22.800Z",
+            "handledAt": null,
+            "handler": null,
+            "handlingResult": null,
+            "note": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "AUD-1782020793624-atf2yj",
+      "timestamp": "2026-06-21T05:46:33.624Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/site/SITE-001"
+      },
+      "operation": "temperature_threshold_site_update",
+      "entityType": "site",
+      "entityId": "SITE-001",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "siteId": "SITE-001",
+        "thresholdBefore": null,
+        "thresholdAfter": null
+      }
+    }
+  ]
 }

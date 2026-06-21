@@ -1,5 +1,5 @@
 import * as anomalyStore from "../lib/temperature-anomaly.js";
-import { getRequestContext } from "../lib/data-store.js";
+import { getRequestContext, listTemperatureThresholds, updateSiteTemperatureThreshold, updateSectionTemperatureThreshold } from "../lib/data-store.js";
 
 function makeCtx(req, body) {
   const headers = (req && req.headers) || {};
@@ -11,6 +11,33 @@ function makeCtx(req, body) {
 }
 
 const routes = [
+  {
+    method: "GET",
+    pattern: /^\/temperature-thresholds$/,
+    handler: async (req) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const siteId = url.searchParams.get("siteId") || null;
+      return listTemperatureThresholds(siteId);
+    }
+  },
+  {
+    method: "PATCH",
+    pattern: /^\/temperature-thresholds\/site\/([^/]+)$/,
+    handler: async (req, _res, body, params) => {
+      const siteId = params[1];
+      const threshold = body.threshold !== undefined ? body.threshold : null;
+      return updateSiteTemperatureThreshold(siteId, threshold, makeCtx(req, body));
+    }
+  },
+  {
+    method: "PATCH",
+    pattern: /^\/temperature-thresholds\/section\/([^/]+)$/,
+    handler: async (req, _res, body, params) => {
+      const sectionId = params[1];
+      const threshold = body.threshold !== undefined ? body.threshold : null;
+      return updateSectionTemperatureThreshold(sectionId, threshold, makeCtx(req, body));
+    }
+  },
   {
     method: "GET",
     pattern: /^\/anomalies\/pending$/,
@@ -67,7 +94,10 @@ export async function handleAnomalyRoutes(req, res, send, readBody) {
         batch_not_found: 404,
         batch_site_mismatch: 409,
         anomaly_not_found: 404,
-        anomaly_already_handled: 409
+        anomaly_already_handled: 409,
+        site_not_found: 404,
+        section_not_found: 404,
+        invalid_threshold: 400
       };
       send(res, statusMap[result.error] || 400, result);
       return true;
