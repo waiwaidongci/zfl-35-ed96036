@@ -1,6 +1,6 @@
 {
-  "_version": 1,
-  "_updatedAt": "2026-06-21T07:37:20.693Z",
+  "_version": 5,
+  "_updatedAt": "2026-06-21T09:16:54.419Z",
   "_dataType": "locations",
   "data": {
     "sites": [
@@ -71,7 +71,7 @@
             ]
           }
         ],
-        "temperatureThreshold": -19
+        "temperatureThreshold": null
       },
       {
         "id": "A3",
@@ -149,12 +149,7 @@
             "id": "C-冷盒-11",
             "name": "备库冷盒11",
             "slotCapacity": 16,
-            "slots": [
-              {
-                "index": 1,
-                "batchId": "RS-001-T-9483"
-              }
-            ]
+            "slots": []
           }
         ],
         "temperatureThreshold": null
