@@ -1150,7 +1150,7 @@ async function testCrossSiteConstraints() {
 // ============================================================
 // 主入口
 // ============================================================
-async function main() {
+export async function runTransferTests() {
   console.log("═══════════════════════════════════════════════════");
   console.log("  多站点调拨流程集成回归测试");
   console.log("═══════════════════════════════════════════════════");
@@ -1163,7 +1163,6 @@ async function main() {
   console.log("═══════════════════════════════════════════════════");
 
   const globalBackups = await backupDataFiles();
-  let exitCode = 0;
 
   try {
     await testCreateTransfer();
@@ -1186,21 +1185,20 @@ async function main() {
         console.log(`  ✗ ${f.name}`);
         console.log(`    ${f.error.message}`);
       }
-      exitCode = 1;
+      throw new Error(`${failures.length} 个调拨测试断言失败`);
     } else {
       console.log("\n  所有集成回归测试通过 ✓");
-      exitCode = 0;
     }
   } catch (err) {
-    console.error("\n测试运行异常:", err);
-    exitCode = 1;
+    throw err;
   } finally {
     console.log("\n  正在恢复 data/ 目录原始数据文件 ...");
     await restoreDataFiles(globalBackups);
     console.log("  data/ 目录已恢复 ✓");
   }
-
-  process.exit(exitCode);
 }
 
-main();
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
+  runTransferTests().catch(err => { console.error(err); process.exit(1); });
+}

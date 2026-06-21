@@ -1,6 +1,6 @@
 {
-  "_version": 42,
-  "_updatedAt": "2026-06-21T10:17:51.082Z",
+  "_version": 43,
+  "_updatedAt": "2026-06-21T10:41:17.250Z",
   "_dataType": "audit-logs",
   "data": {
     "logs": [
@@ -2285,6 +2285,75 @@
               "motherPlant": "MP-17"
             },
             "mismatchedBatch": "RS-002"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782038477248-mnczw3",
+        "timestamp": "2026-06-21T10:41:17.248Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:17:07.053Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:41:17.247Z",
+              "transactionsCount": 2,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 21,
+            "locVersion": null,
+            "auditVersion": 42
+          },
+          "after": {
+            "dataVersion": 22,
+            "locVersion": null,
+            "auditVersion": 42
           }
         }
       }

@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   getCurrentVersions,
   loadAudit,
@@ -32,7 +33,7 @@ async function restoreDataFiles(backups) {
   }
 }
 
-async function main() {
+export async function runFixesTests() {
   const backups = await backupDataFiles();
   try {
     console.log("=== 隔离验证 JSON 版本读写、锁串行化和冲突审计 ===");
@@ -128,7 +129,7 @@ async function main() {
   }
 }
 
-main().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
+  runFixesTests().catch(err => { console.error(err); process.exit(1); });
+}
