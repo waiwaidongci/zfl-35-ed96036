@@ -95,7 +95,9 @@ export async function handleLabelRoutes(req, res, send, readBody) {
     if (result === null) { send(res, 404, { error: "not_found" }); return true; }
     if (result.error) {
       const statusMap = {
-        batch_not_found: 404
+        batch_not_found: 404,
+        version_conflict: 409,
+        transaction_failed: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;

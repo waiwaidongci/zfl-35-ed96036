@@ -48,7 +48,9 @@ export async function handleLocationRoutes(req, res, send, readBody) {
         slot_already_occupied: 409,
         slot_index_out_of_range: 400,
         site_disabled: 409,
-        site_mismatch: 409
+        site_mismatch: 409,
+        version_conflict: 409,
+        transaction_failed: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;

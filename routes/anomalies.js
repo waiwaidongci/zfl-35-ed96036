@@ -97,7 +97,9 @@ export async function handleAnomalyRoutes(req, res, send, readBody) {
         anomaly_already_handled: 409,
         site_not_found: 404,
         section_not_found: 404,
-        invalid_threshold: 400
+        invalid_threshold: 400,
+        version_conflict: 409,
+        transaction_failed: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;

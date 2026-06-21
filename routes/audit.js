@@ -59,7 +59,9 @@ export async function handleAuditRoutes(req, res, send, readBody) {
     if (result.error) {
       const statusMap = {
         batch_not_found: 404,
-        invalid_target_time: 400
+        invalid_target_time: 400,
+        version_conflict: 409,
+        transaction_failed: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;

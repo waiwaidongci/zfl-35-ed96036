@@ -15,6 +15,8 @@ import { createTransfer, shipTransfer, receiveTransfer, cancelTransfer, getTrans
 import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability, filterBatchesByRetestPriority } from "./lib/viability-trend.js";
 import {
   loadDb,
+  loadDbWithVersion,
+  getCurrentVersions,
   mutate,
   OPERATION,
   clone,
@@ -103,6 +105,7 @@ const server = http.createServer(async (req, res) => {
     const db = await loadDb();
     if (req.method === "GET" && url.pathname === "/") {
       const endpoints = [
+        "GET /version",
         "GET /sites",
         "GET /sites/:id",
         "POST /sites",
@@ -156,6 +159,7 @@ const server = http.createServer(async (req, res) => {
         "GET /labels/batches/:id",
         "GET /labels/batches?siteId=&species=&collectionPlace=&section=&viability=",
         "POST /labels/batches/batch",
+        "GET /imports/versions",
         "POST /imports/preview",
         "POST /imports/confirm",
         "GET /audit-logs?siteId=",
@@ -164,6 +168,11 @@ const server = http.createServer(async (req, res) => {
         "GET /batches/:id/history/replay"
       ];
       return send(res, 200, { service: "稀有种子冷库库存和活性追踪API（多站点版）", endpoints });
+    }
+
+    if (req.method === "GET" && url.pathname === "/version") {
+      const versions = await getCurrentVersions();
+      return send(res, 200, versions);
     }
 
     if (req.method === "GET" && url.pathname === "/sites") {
@@ -189,7 +198,8 @@ const server = http.createServer(async (req, res) => {
       if (!input.id) return send(res, 400, { error: "missing_site_id" });
       const result = await createSite(input, ctx);
       if (result.error) {
-        return send(res, result.error === "site_already_exists" ? 409 : 400, result);
+        const conflictErrors = ["site_already_exists", "version_conflict", "transaction_failed"];
+        return send(res, conflictErrors.includes(result.error) ? 409 : 400, result);
       }
       return send(res, 201, result.site || result);
     }
@@ -202,7 +212,9 @@ const server = http.createServer(async (req, res) => {
       if (result.error) {
         const statusMap = {
           site_not_found: 404,
-          default_site_cannot_disable: 409
+          default_site_cannot_disable: 409,
+          version_conflict: 409,
+          transaction_failed: 409
         };
         return send(res, statusMap[result.error] || 400, result);
       }
@@ -213,7 +225,8 @@ const server = http.createServer(async (req, res) => {
       const input = await body(req);
       const result = await mergeBatches(input.batchIds, input.target, makeCtx(req, input));
       if (result.error) {
-        const statusCode = result.error === "batch_not_found" ? 404 : 409;
+        const notFoundErrors = ["batch_not_found"];
+        const statusCode = notFoundErrors.includes(result.error) ? 404 : 409;
         return send(res, statusCode, result);
       }
       return send(res, 201, result);
@@ -228,7 +241,9 @@ const server = http.createServer(async (req, res) => {
           batch_not_found: 404,
           source_site_not_found: 404,
           target_site_not_found: 404,
-          merge_target_not_found: 404
+          merge_target_not_found: 404,
+          version_conflict: 409,
+          transaction_failed: 409
         };
         return send(res, statusMap[result.error] || 400, result);
       }
@@ -269,50 +284,56 @@ const server = http.createServer(async (req, res) => {
       if (req.method === "PATCH" && action === "ship") {
         const result = await shipTransfer(transferId, ctx);
         if (result.error) {
-          const statusMap = {
-            transfer_not_found: 404,
-            batch_not_found: 404,
-            invalid_status_transition: 409,
-            insufficient_available_quantity: 409,
-            batch_not_active: 409
-          };
-          return send(res, statusMap[result.error] || 400, result);
-        }
+        const statusMap = {
+          transfer_not_found: 404,
+          batch_not_found: 404,
+          invalid_status_transition: 409,
+          insufficient_available_quantity: 409,
+          batch_not_active: 409,
+          version_conflict: 409,
+          transaction_failed: 409
+        };
+        return send(res, statusMap[result.error] || 400, result);
+      }
         return send(res, 200, result);
       }
 
       if (req.method === "PATCH" && action === "receive") {
         const result = await receiveTransfer(transferId, input, ctx);
         if (result.error) {
-          const statusMap = {
-            transfer_not_found: 404,
-            batch_not_found: 404,
-            merge_target_not_found: 404,
-            invalid_status_transition: 409,
-            box_not_found: 404,
-            site_mismatch: 409,
-            section_box_mismatch: 409,
-            slot_index_out_of_range: 400,
-            slot_already_occupied: 409,
-            transfer_merge_mismatch: 409,
-            merge_target_not_active: 409,
-            merge_target_site_mismatch: 409,
-            inconsistent_in_transit_quantity: 500
-          };
-          return send(res, statusMap[result.error] || 400, result);
-        }
+        const statusMap = {
+          transfer_not_found: 404,
+          batch_not_found: 404,
+          merge_target_not_found: 404,
+          invalid_status_transition: 409,
+          box_not_found: 404,
+          site_mismatch: 409,
+          section_box_mismatch: 409,
+          slot_index_out_of_range: 400,
+          slot_already_occupied: 409,
+          transfer_merge_mismatch: 409,
+          merge_target_not_active: 409,
+          merge_target_site_mismatch: 409,
+          inconsistent_in_transit_quantity: 500,
+          version_conflict: 409,
+          transaction_failed: 409
+        };
+        return send(res, statusMap[result.error] || 400, result);
+      }
         return send(res, 200, result);
       }
 
       if (req.method === "PATCH" && action === "cancel") {
         const result = await cancelTransfer(transferId, ctx);
         if (result.error) {
-          const statusMap = {
-            transfer_not_found: 404,
-            invalid_status_transition: 409
-          };
-          return send(res, statusMap[result.error] || 400, result);
-        }
+        const statusMap = {
+          transfer_not_found: 404,
+          invalid_status_transition: 409,
+          version_conflict: 409,
+          transaction_failed: 409
+        };
+        return send(res, statusMap[result.error] || 400, result);
+      }
         return send(res, 200, result);
       }
     }
@@ -434,7 +455,8 @@ const server = http.createServer(async (req, res) => {
       });
 
       if (result.error) {
-        return send(res, result.error === "site_disabled" ? 409 : 400, result);
+        const conflictErrors = ["site_disabled", "version_conflict", "transaction_failed"];
+        return send(res, conflictErrors.includes(result.error) ? 409 : 400, result);
       }
       return send(res, 201, result.batch || result);
     }
@@ -450,7 +472,8 @@ const server = http.createServer(async (req, res) => {
         const input = await body(req);
         const result = await splitBatch(batch.id, input.items, makeCtx(req, input));
         if (result.error) {
-          const statusCode = result.error === "batch_not_found" ? 404 : 409;
+          const notFoundErrors = ["batch_not_found"];
+          const statusCode = notFoundErrors.includes(result.error) ? 404 : 409;
           return send(res, statusCode, result);
         }
         return send(res, 201, result);

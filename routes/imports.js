@@ -1,5 +1,5 @@
 import * as store from "../lib/import-store.js";
-import { getRequestContext } from "../lib/data-store.js";
+import { getRequestContext, getCurrentVersions } from "../lib/data-store.js";
 
 function makeCtx(req, body) {
   const headers = (req && req.headers) || {};
@@ -11,6 +11,11 @@ function makeCtx(req, body) {
 }
 
 const routes = [
+  {
+    method: "GET",
+    pattern: /^\/imports\/versions$/,
+    handler: async (_req, _res, _body) => getCurrentVersions()
+  },
   {
     method: "POST",
     pattern: /^\/imports\/preview$/,
@@ -30,6 +35,8 @@ const errorStatusMap = {
   token_not_found: 404,
   token_expired: 410,
   data_changed_since_preview: 409,
+  version_conflict: 409,
+  transaction_failed: 409,
   no_importable_rows: 409,
   site_disabled: 409
 };

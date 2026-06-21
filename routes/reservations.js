@@ -79,7 +79,9 @@ export async function handleReservationRoutes(req, res, send, readBody) {
         invalid_quantity: 400,
         invalid_status_transition: 409,
         insufficient_available_quantity: 409,
-        negative_inventory_blocked: 409
+        negative_inventory_blocked: 409,
+        version_conflict: 409,
+        transaction_failed: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;
