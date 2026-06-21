@@ -69,30 +69,7 @@ const routes = [
     handler: async (req, _res, _body, params) => {
       const url = new URL(req.url, `http://${req.headers.host}`);
       const options = parseRetestOptions(url);
-      const analysis = await viabilityStore.getBatchViabilityAnalysis(params[1], options);
-      if (analysis && analysis.error) {
-        return analysis;
-      }
-      if (!analysis) {
-        return { error: "batch_not_found" };
-      }
-      return {
-        batchId: analysis.batchId,
-        retestPriority: analysis.retestPriority,
-        priorityScore: analysis.priorityScore,
-        retestReasons: analysis.retestReasons,
-        ruleTriggers: analysis.ruleTriggers,
-        suggestedRetestDate: analysis.suggestedRetestDate,
-        retestIntervalDays: analysis.retestIntervalDays,
-        latestRate: analysis.latestRate,
-        latestRateFormatted: analysis.latestRateFormatted,
-        daysSinceLastTest: analysis.daysSinceLastTest,
-        lastTestDate: analysis.lastTestDate,
-        trendDirection: analysis.trendDirection,
-        pendingReviewCount: analysis.pendingReviewCount,
-        germinationCount: analysis.germinationCount
-
-      };
+      return viabilityStore.getBatchRetestPlan(params[1], options);
     }
   }
 ];
