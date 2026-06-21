@@ -1899,6 +1899,7 @@ curl "http://localhost:3035/batches?riskLevel=warning&section=A2"
 - **数据库指纹（fingerprint）**：预览时记录当前数据库状态的 MD5 摘要，确认时校验指纹是否一致。若预览后有人修改了批次数据（新增/删除/修改数量），指纹会变化，确认将被拒绝
 - **令牌有效期**：预览令牌 30 分钟内有效，过期需重新预览
 - **导入限制**：单次导入不超过 1000 条
+- **站点归属**：导入行可传 `siteId` 指定站点；未传时默认归属主冷库；预览会返回站点归属提示和跨站点摘要
 
 ### 校验规则
 
@@ -1920,6 +1921,7 @@ curl "http://localhost:3035/batches?riskLevel=warning&section=A2"
 | `section` | string | 分区 |
 | `viability` | string | 活性等级：`high`/`medium`/`low`/`unknown`，不合法值会被设为 `unknown` |
 | `remark` | string | 备注 |
+| `siteId` | string | 所属站点 ID；未传时默认归属主冷库 |
 
 #### 校验项
 
@@ -1931,8 +1933,10 @@ curl "http://localhost:3035/batches?riskLevel=warning&section=A2"
 | `duplicate_id_in_import` | 错误 | 批次号在导入列表内重复 |
 | `quantity_not_positive` | 错误 | 数量不为正数 |
 | `quantity_too_large` | 错误 | 数量超过 10,000,000 |
+| `site_not_found` | 错误 | `siteId` 指向的站点不存在 |
 | `invalid_viability` | 警告 | 活性等级值不合法，将被设为 `unknown` |
 | `non_integer_quantity` | 警告 | 数量非整数，将被截断 |
+| `site_defaulted` | 警告 | 未传 `siteId`，导入行将默认归属主冷库 |
 
 ### 接口一览
 
@@ -1961,13 +1965,14 @@ curl -X POST http://localhost:3035/imports/preview \
   -d '{
     "batches": [
       {
-        "id": "RS-010",
+        "id": "RS-014",
         "species": "红豆杉",
         "quantity": 2000,
         "collectionPlace": "秦岭南坡",
         "motherPlant": "MP-22",
         "container": "C-冷盒-15",
         "section": "B1",
+        "siteId": "SITE-002",
         "viability": "high"
       },
       {
@@ -1979,9 +1984,20 @@ curl -X POST http://localhost:3035/imports/preview \
         "section": "B1"
       },
       {
+        "id": "RS-013",
+        "species": "银杏",
+        "quantity": 900,
+        "siteId": "SITE-NOT-FOUND"
+      },
+      {
         "id": "RS-010",
         "species": "水杉",
         "quantity": 500
+      },
+      {
+        "id": "RS-010",
+        "species": "水杉",
+        "quantity": 400
       },
       {
         "id": "RS-012",
@@ -2003,16 +2019,29 @@ curl -X POST http://localhost:3035/imports/preview \
 {
   "previewToken": "IMP-1718888888888-abc123",
   "fingerprint": "a1b2c3d4e5f6...",
-  "totalRows": 5,
-  "importableCount": 1,
-  "invalidCount": 4,
+  "totalRows": 7,
+  "importableCount": 2,
+  "invalidCount": 5,
   "importableRows": [
+    {
+      "index": 0,
+      "id": "RS-014",
+      "species": "红豆杉",
+      "quantity": 2000,
+      "siteId": "SITE-002",
+      "siteAttribution": "explicit",
+      "warnings": []
+    },
     {
       "index": 1,
       "id": "RS-011",
       "species": "珙桐",
       "quantity": 1500,
-      "warnings": []
+      "siteId": "SITE-001",
+      "siteAttribution": "defaulted",
+      "warnings": [
+        { "code": "site_defaulted", "field": "siteId", "message": "未指定 siteId，将默认归属 主冷库 (SITE-001)" }
+      ]
     }
   ],
   "duplicateIds": [
@@ -2021,7 +2050,7 @@ curl -X POST http://localhost:3035/imports/preview \
   "duplicateExistingIds": ["RS-001"],
   "quantityAnomalies": [
     {
-      "index": 3,
+      "index": 5,
       "id": "RS-012",
       "quantity": -100,
       "issues": [
@@ -2029,47 +2058,70 @@ curl -X POST http://localhost:3035/imports/preview \
       ]
     }
   ],
+  "invalidSites": [
+    {
+      "index": 2,
+      "id": "RS-013",
+      "siteId": "SITE-NOT-FOUND",
+      "issues": [
+        { "code": "site_not_found", "field": "siteId", "message": "站点 SITE-NOT-FOUND 不存在于系统中" }
+      ]
+    }
+  ],
+  "siteSummary": {
+    "SITE-002": {
+      "siteId": "SITE-002",
+      "siteName": "二号备库",
+      "count": 1,
+      "totalQuantity": 2000,
+      "defaultedCount": 0,
+      "explicitCount": 1
+    },
+    "SITE-001": {
+      "siteId": "SITE-001",
+      "siteName": "主冷库",
+      "count": 1,
+      "totalQuantity": 1500,
+      "defaultedCount": 1,
+      "explicitCount": 0
+    }
+  },
+  "crossSite": true,
+  "siteIds": ["SITE-002", "SITE-001"],
+  "defaultedRowCount": 1,
+  "defaultSite": {
+    "siteId": "SITE-001",
+    "siteName": "主冷库"
+  },
   "validationResults": [
     {
       "index": 0,
-      "id": "RS-010",
-      "valid": false,
-      "errors": [
-        { "code": "duplicate_id_in_import", "field": "id", "message": "批次号 RS-010 在导入列表中重复出现 2 次" }
-      ],
+      "id": "RS-014",
+      "valid": true,
+      "siteId": "SITE-002",
+      "siteAttribution": "explicit",
+      "errors": [],
       "warnings": []
     },
     {
       "index": 1,
       "id": "RS-011",
       "valid": true,
+      "siteId": "SITE-001",
+      "siteAttribution": "defaulted",
       "errors": [],
-      "warnings": []
+      "warnings": [
+        { "code": "site_defaulted", "field": "siteId", "message": "未指定 siteId，将默认归属 主冷库 (SITE-001)" }
+      ]
     },
     {
       "index": 2,
-      "id": "RS-010",
+      "id": "RS-013",
       "valid": false,
+      "siteId": null,
+      "siteAttribution": null,
       "errors": [
-        { "code": "duplicate_id_in_import", "field": "id", "message": "批次号 RS-010 在导入列表中重复出现 2 次" }
-      ],
-      "warnings": []
-    },
-    {
-      "index": 3,
-      "id": "RS-012",
-      "valid": false,
-      "errors": [
-        { "code": "quantity_not_positive", "field": "quantity", "message": "quantity 必须大于0" }
-      ],
-      "warnings": []
-    },
-    {
-      "index": 4,
-      "id": "RS-001",
-      "valid": false,
-      "errors": [
-        { "code": "duplicate_id_existing", "field": "id", "message": "批次号 RS-001 已存在于系统中" }
+        { "code": "site_not_found", "field": "siteId", "message": "站点 SITE-NOT-FOUND 不存在于系统中" }
       ],
       "warnings": []
     }
@@ -2077,9 +2129,24 @@ curl -X POST http://localhost:3035/imports/preview \
 }
 ```
 
+预览响应中的站点相关字段：
+
+| 字段 | 说明 |
+|------|------|
+| `importableRows[].siteId` | 校验通过行最终会写入的站点 ID |
+| `importableRows[].siteAttribution` | `explicit` 表示导入行显式传入，`defaulted` 表示未传时默认归属 |
+| `invalidSites` | 不存在站点的行级错误摘要 |
+| `siteSummary` | 按站点统计可导入行数、数量合计、默认归属行数和显式传入行数 |
+| `crossSite` | 本次可导入行是否跨多个站点 |
+| `siteIds` | 本次可导入行涉及的站点 ID 列表 |
+| `defaultedRowCount` | 未传 `siteId` 并默认归属主冷库的可导入行数 |
+| `defaultSite` | 当前默认站点信息 |
+
 #### POST `/imports/confirm` — 确认导入
 
 使用预览令牌确认导入。系统会校验令牌有效性、数据库指纹一致性以及批次号是否仍无冲突，全部通过后才写入批次数据并生成 collect 流水。确认后令牌自动失效。
+
+确认导入会沿用预览阶段解析出的 `siteId` 写入批次；未传 `siteId` 的行会写入预览时返回的默认主冷库 `siteId`。
 
 **请求体：**
 
@@ -2101,13 +2168,23 @@ curl -X POST http://localhost:3035/imports/confirm \
 
 ```json
 {
-  "imported": 1,
-  "totalRows": 5,
-  "importableCount": 1,
-  "invalidCount": 4,
+  "imported": 2,
+  "totalRows": 7,
+  "importableCount": 2,
+  "invalidCount": 5,
   "batches": [
     {
+      "id": "RS-014",
+      "siteId": "SITE-002",
+      "species": "红豆杉",
+      "quantity": 2000,
+      "container": "C-冷盒-15",
+      "section": "B1",
+      "viability": "high"
+    },
+    {
       "id": "RS-011",
+      "siteId": "SITE-001",
       "species": "珙桐",
       "quantity": 1500,
       "container": "C-冷盒-16",
