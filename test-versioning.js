@@ -139,13 +139,15 @@ const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   (async () => {
     const backups = await backupDataFiles();
+    let exitCode = 0;
     try {
       await runVersioningTests();
     } catch (err) {
       console.error(err);
-      process.exit(1);
+      exitCode = 1;
     } finally {
       await restoreDataFiles(backups);
     }
+    process.exitCode = exitCode;
   })();
 }

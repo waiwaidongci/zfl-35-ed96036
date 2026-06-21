@@ -1,6 +1,6 @@
 {
-  "_version": 1,
-  "_updatedAt": "2026-06-21T09:25:00.749Z",
+  "_version": 3,
+  "_updatedAt": "2026-06-21T10:11:56.120Z",
   "_dataType": "locations",
   "data": {
     "sites": [
@@ -33,7 +33,8 @@
             "slotCapacity": 20,
             "slots": []
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "A2",
@@ -69,7 +70,8 @@
               }
             ]
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "A3",
@@ -82,7 +84,8 @@
             "slotCapacity": 16,
             "slots": []
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "B1",
@@ -95,7 +98,8 @@
             "slotCapacity": 24,
             "slots": []
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "C1",
@@ -113,7 +117,8 @@
               }
             ]
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "A1-BK",
@@ -132,7 +137,8 @@
             "slotCapacity": 20,
             "slots": []
           }
-        ]
+        ],
+        "temperatureThreshold": null
       },
       {
         "id": "A3-BK",
@@ -145,7 +151,8 @@
             "slotCapacity": 16,
             "slots": []
           }
-        ]
+        ],
+        "temperatureThreshold": null
       }
     ]
   }
