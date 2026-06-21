@@ -1,8 +1,30 @@
 import { fileURLToPath } from "node:url";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { loadDbWithVersion, getCurrentVersions, mutate, OPERATION, computeBatchDigest, computeDataFingerprint } from "./lib/data-store.js";
+
+const DATA_FILES = [
+  join("data", "rare-seeds.json"),
+  join("data", "locations.json"),
+  join("data", "audit-logs.json")
+];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+async function backupDataFiles() {
+  const backups = new Map();
+  for (const file of DATA_FILES) {
+    backups.set(file, await readFile(file, "utf8"));
+  }
+  return backups;
+}
+
+async function restoreDataFiles(backups) {
+  for (const [file, content] of backups.entries()) {
+    await writeFile(file, content);
+  }
 }
 
 export async function runVersioningTests() {
@@ -115,5 +137,15 @@ export async function runVersioningTests() {
 
 const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
-  runVersioningTests().catch(err => { console.error(err); process.exit(1); });
+  (async () => {
+    const backups = await backupDataFiles();
+    try {
+      await runVersioningTests();
+    } catch (err) {
+      console.error(err);
+      process.exit(1);
+    } finally {
+      await restoreDataFiles(backups);
+    }
+  })();
 }
