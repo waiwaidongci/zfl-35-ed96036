@@ -1,8 +1,21 @@
 {
+  "sites": [
+    {
+      "id": "SITE-001",
+      "name": "主冷库",
+      "code": "MAIN"
+    },
+    {
+      "id": "SITE-002",
+      "name": "二号备库",
+      "code": "BACKUP"
+    }
+  ],
   "sections": [
     {
       "id": "A1",
       "name": "A1极低温区",
+      "siteId": "SITE-001",
       "boxes": [
         {
           "id": "C-冷盒-01",
@@ -16,12 +29,12 @@
           "slotCapacity": 20,
           "slots": []
         }
-      ],
-      "siteId": "SITE-001"
+      ]
     },
     {
       "id": "A2",
       "name": "A2低温区",
+      "siteId": "SITE-001",
       "boxes": [
         {
           "id": "C-冷盒-07",
@@ -31,10 +44,6 @@
             {
               "index": 2,
               "batchId": "RS-002"
-            },
-            {
-              "index": 3,
-              "batchId": "RS-004"
             }
           ]
         },
@@ -61,39 +70,7 @@
             }
           ]
         }
-      ],
-      "siteId": "SITE-001"
-    },
-    {
-      "id": "B1",
-      "name": "B1中温区",
-      "boxes": [
-        {
-          "id": "C-冷盒-15",
-          "name": "冷盒15",
-          "slotCapacity": 24,
-          "slots": []
-        }
-      ],
-      "siteId": "SITE-001"
-    },
-    {
-      "id": "C1",
-      "name": "C1恒温区",
-      "boxes": [
-        {
-          "id": "C-冷盒-30",
-          "name": "冷盒30",
-          "slotCapacity": 12,
-          "slots": [
-            {
-              "index": 1,
-              "batchId": null
-            }
-          ]
-        }
-      ],
-      "siteId": "SITE-001"
+      ]
     },
     {
       "id": "A3",
@@ -104,10 +81,36 @@
           "id": "C-冷盒-10",
           "name": "冷盒10",
           "slotCapacity": 16,
+          "slots": []
+        }
+      ]
+    },
+    {
+      "id": "B1",
+      "name": "B1中温区",
+      "siteId": "SITE-002",
+      "boxes": [
+        {
+          "id": "C-冷盒-15",
+          "name": "冷盒15",
+          "slotCapacity": 24,
+          "slots": []
+        }
+      ]
+    },
+    {
+      "id": "C1",
+      "name": "C1恒温区",
+      "siteId": "SITE-002",
+      "boxes": [
+        {
+          "id": "C-冷盒-30",
+          "name": "冷盒30",
+          "slotCapacity": 12,
           "slots": [
             {
-              "index": 5,
-              "batchId": "RS-003"
+              "index": 1,
+              "batchId": null
             }
           ]
         }
@@ -144,18 +147,6 @@
           "slots": []
         }
       ]
-    }
-  ],
-  "sites": [
-    {
-      "id": "SITE-001",
-      "name": "主冷库",
-      "code": "MAIN"
-    },
-    {
-      "id": "SITE-002",
-      "name": "二号备库",
-      "code": "BACKUP"
     }
   ]
 }
