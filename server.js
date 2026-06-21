@@ -119,7 +119,7 @@ const server = http.createServer(async (req, res) => {
         "PATCH /batches/:id/anomalies/:anomalyId/handle",
         "POST /anomalies/scan?batchId=&threshold=&siteId=",
         "GET /reservations?status=&applicant=&plannedDateFrom=&plannedDateTo=&siteId=",
-        "GET /reports/inventory?siteId=&applicant=&plannedDateFrom=&plannedDateTo=",
+        "GET /reports/inventory?siteId=&applicant=&plannedDateFrom=&plannedDateTo=&reservationStatus=",
         "GET /reports/viability-risk?siteId=&lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=",
         "GET /batches/:id/viability",
         "GET /locations/sites",
@@ -488,7 +488,9 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && url.pathname === "/reports/inventory") {
       const siteIdParam = url.searchParams.get("siteId");
+      const reservationStatus = url.searchParams.get("reservationStatus") || "";
       const reservationFilters = {
+        status: reservationStatus,
         applicant: url.searchParams.get("applicant") || "",
         plannedDateFrom: url.searchParams.get("plannedDateFrom") || "",
         plannedDateTo: url.searchParams.get("plannedDateTo") || ""
