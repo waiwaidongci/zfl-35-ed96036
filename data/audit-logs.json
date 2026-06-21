@@ -1632,6 +1632,631 @@
           "anomalies": []
         }
       }
+    },
+    {
+      "id": "AUD-1782025683265-12t7hf",
+      "timestamp": "2026-06-21T07:08:03.265Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782025683265-3f",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782025683265-3f",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 1000,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "约束测试",
+          "createdAt": "2026-06-21T07:08:03.265Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782025683322-vsomm5",
+      "timestamp": "2026-06-21T07:08:03.322Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782025683265-3f/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782025683265-3f",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1100,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 0,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 3,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1100,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 3,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782025683265-3f",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 1000,
+          "status": "shipped",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "约束测试",
+          "createdAt": "2026-06-21T07:08:03.265Z",
+          "shippedAt": "2026-06-21T07:08:03.322Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-001",
+          "inTransitQuantityAfter": 1000,
+          "availableQuantityAfter": 100
+        }
+      }
+    },
+    {
+      "id": "AUD-1782025724869-dcrhw4",
+      "timestamp": "2026-06-21T07:08:44.869Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /batches/RS-001/transactions"
+      },
+      "operation": "transaction_add",
+      "entityType": "batch",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1100,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 3,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1050,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 4,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "transaction": {
+          "id": "TX-1782025724869",
+          "at": "2026-06-21T07:08:44.869Z",
+          "type": "sample",
+          "quantity": 50,
+          "balance": 1050,
+          "note": "测试正常范围内"
+        },
+        "quantityAfter": 1050
+      }
+    },
+    {
+      "id": "AUD-1782026300928-kjsi3q",
+      "timestamp": "2026-06-21T07:18:20.928Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /batches/RS-001/transactions"
+      },
+      "operation": "transaction_add",
+      "entityType": "batch",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1050,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 4,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1000,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 5,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "transaction": {
+          "id": "TX-1782026300928",
+          "at": "2026-06-21T07:18:20.928Z",
+          "type": "sample",
+          "quantity": 50,
+          "balance": 1000,
+          "note": "测试在途边界"
+        },
+        "quantityAfter": 1000
+      }
+    },
+    {
+      "id": "AUD-1782026301000-rl6r9g",
+      "timestamp": "2026-06-21T07:18:21.000Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /batches/RS-001/transactions"
+      },
+      "operation": "transaction_add",
+      "entityType": "batch",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1000,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 5,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 6,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "transaction": {
+          "id": "TX-1782026301000",
+          "at": "2026-06-21T07:18:21.000Z",
+          "type": "collect",
+          "quantity": 500,
+          "balance": 1500,
+          "note": "补充入库"
+        },
+        "quantityAfter": 1500
+      }
+    },
+    {
+      "id": "AUD-1782026319667-dv5694",
+      "timestamp": "2026-06-21T07:18:39.667Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /batches/RS-001/reservations"
+      },
+      "operation": "reservation_create",
+      "entityType": "reservation",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 6,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 4
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 6,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 4
+          }
+        }
+      },
+      "details": {
+        "reservation": {
+          "id": "RES-1782026319667",
+          "applicant": "张三",
+          "purpose": "科研项目",
+          "quantity": 600,
+          "plannedDate": "2026-08-01",
+          "status": "pending",
+          "createdAt": "2026-06-21T07:18:39.667Z",
+          "updatedAt": "2026-06-21T07:18:39.667Z"
+        }
+      }
+    },
+    {
+      "id": "AUD-1782026385823-ks24lm",
+      "timestamp": "2026-06-21T07:19:45.823Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /batches/RS-001/split"
+      },
+      "operation": "batch_split",
+      "entityType": "batch",
+      "entityId": "RS-001",
+      "affectedBatches": [
+        "RS-001",
+        "RS-001-S1-5823",
+        "RS-001-S2-5823"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 6,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 4
+          },
+          "RS-001-S1-5823": null,
+          "RS-001-S2-5823": null
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1000,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 1000,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 7,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 4
+          },
+          "RS-001-S1-5823": {
+            "id": "RS-001-S1-5823",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-12",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 300,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "从批次 RS-001 拆分",
+            "transactionsCount": 1,
+            "temperaturesCount": 0,
+            "germinationsCount": 0,
+            "reviewsCount": 0,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          },
+          "RS-001-S2-5823": {
+            "id": "RS-001-S2-5823",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-13",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "从批次 RS-001 拆分",
+            "transactionsCount": 1,
+            "temperaturesCount": 0,
+            "germinationsCount": 0,
+            "reviewsCount": 0,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          }
+        }
+      },
+      "details": {
+        "sourceBatch": {
+          "id": "RS-001",
+          "quantityAfter": 1000,
+          "statusAfter": "active",
+          "transaction": {
+            "id": "TX-1782026385823-yh6n",
+            "at": "2026-06-21T07:19:45.823Z",
+            "type": "split_out",
+            "quantity": 500,
+            "balance": 1000,
+            "note": "拆分为 RS-001-S1-5823、RS-001-S2-5823，共拆分 500 粒"
+          },
+          "splitToIds": [
+            "RS-001-S1-5823",
+            "RS-001-S2-5823"
+          ]
+        },
+        "childBatches": [
+          {
+            "id": "RS-001-S1-5823",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "motherPlant": "MP-17",
+            "container": "C-冷盒-12",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 300,
+            "status": "active",
+            "lineage": {
+              "splitFrom": "RS-001",
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782026385823-87re",
+                "at": "2026-06-21T07:19:45.823Z",
+                "type": "split_in",
+                "quantity": 300,
+                "balance": 300,
+                "note": "从批次 RS-001 拆分子批次，拆分数量 300"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "从批次 RS-001 拆分",
+            "reviews": [],
+            "anomalies": []
+          },
+          {
+            "id": "RS-001-S2-5823",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "motherPlant": "MP-17",
+            "container": "C-冷盒-13",
+            "section": "A1",
+            "viability": "high",
+            "quantity": 200,
+            "status": "active",
+            "lineage": {
+              "splitFrom": "RS-001",
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782026385823-tjk7",
+                "at": "2026-06-21T07:19:45.823Z",
+                "type": "split_in",
+                "quantity": 200,
+                "balance": 200,
+                "note": "从批次 RS-001 拆分子批次，拆分数量 200"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "从批次 RS-001 拆分",
+            "reviews": [],
+            "anomalies": []
+          }
+        ]
+      }
     }
   ]
 }

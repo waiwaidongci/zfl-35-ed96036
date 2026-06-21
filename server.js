@@ -63,6 +63,12 @@ function applyTransaction(batch, input) {
   const positive = ["collect", "return", "split_in", "merge_in", "transfer_in"].includes(input.type);
   const next = batch.quantity + (positive ? qty : negative ? -qty : 0);
   if (next < 0) return { error: "negative_inventory_blocked" };
+  if (negative) {
+    const frozen = batch.frozenQuantity || 0;
+    const inTransit = batch.inTransitQuantity || 0;
+    const available = batch.quantity - frozen - inTransit;
+    if (qty > available) return { error: "insufficient_available_quantity", available, requested: qty, frozen, inTransit };
+  }
   batch.quantity = next;
   const tx = { id: `TX-${Date.now()}`, at: input.at || new Date().toISOString(), type: input.type, quantity: qty, balance: batch.quantity, note: input.note || "" };
   batch.transactions.push(tx);
