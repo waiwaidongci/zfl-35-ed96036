@@ -1,18 +1,6 @@
-import { readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { buildLabel, buildLabels } from "../lib/label-formatter.js";
 import * as locationStore from "../lib/location-store.js";
-import { getDefaultSiteId, filterBatchesBySite } from "../lib/data-store.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = join(__dirname, "..", "data", "rare-seeds.json");
-
-async function loadDb() {
-  if (!existsSync(dbPath)) return { batches: [], sites: [] };
-  return JSON.parse(await readFile(dbPath, "utf8"));
-}
+import { loadDb, getDefaultSiteId, filterBatchesBySite } from "../lib/data-store.js";
 
 function buildSiteMap(db) {
   const map = {};

@@ -1,8 +1,975 @@
 {
-  "_version": 1,
-  "_updatedAt": "2026-06-21T09:25:00.749Z",
+  "_version": 19,
+  "_updatedAt": "2026-06-21T10:03:50.296Z",
   "_dataType": "audit-logs",
   "data": {
-    "logs": []
+    "logs": [
+      {
+        "id": "AUD-1782034939330-iwi403",
+        "timestamp": "2026-06-21T09:42:19.330Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782034939330"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782034939330": null
+          },
+          "after": {
+            "RS-1782034939330": {
+              "id": "RS-1782034939330",
+              "siteId": "SITE-001",
+              "species": "测试物种",
+              "collectionPlace": "测试地",
+              "container": "C-TEST",
+              "section": "A2",
+              "viability": "unknown",
+              "quantity": 100,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782034939330",
+            "siteId": "SITE-001",
+            "species": "测试物种",
+            "collectionPlace": "测试地",
+            "container": "C-TEST",
+            "section": "A2",
+            "viability": "unknown",
+            "quantity": 100,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782034939330",
+                "at": "2026-06-21T09:42:19.330Z",
+                "type": "collect",
+                "quantity": 100,
+                "balance": 100,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 2,
+            "locVersion": null,
+            "auditVersion": 1
+          },
+          "after": {
+            "dataVersion": 3,
+            "locVersion": null,
+            "auditVersion": 1
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034939361-hnxvxn",
+        "timestamp": "2026-06-21T09:42:19.361Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "PATCH /batches/RS-001/remark"
+        },
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "初始入库批次，待质量复核",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 1,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试备注更新",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 1,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "remark": "测试备注更新"
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 3,
+            "locVersion": null,
+            "auditVersion": 2
+          },
+          "after": {
+            "dataVersion": 4,
+            "locVersion": null,
+            "auditVersion": 2
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034939370-1t3yoj",
+        "timestamp": "2026-06-21T09:42:19.370Z",
+        "operator": "测试管理员",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/RS-001/reviews"
+        },
+        "operation": "review_add",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试备注更新",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 1,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试备注更新",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "review": {
+            "id": "RV-1782034939370",
+            "at": "2026-06-21T09:42:19.370Z",
+            "reviewer": "测试管理员",
+            "conclusion": "approved",
+            "note": "测试复核"
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 4,
+            "locVersion": null,
+            "auditVersion": 3
+          },
+          "after": {
+            "dataVersion": 5,
+            "locVersion": null,
+            "auditVersion": 3
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034951247-hwo3cv",
+        "timestamp": "2026-06-21T09:42:31.247Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "version_conflict",
+        "entityType": "transfer",
+        "entityId": null,
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 5,
+            "locVersion": null,
+            "auditVersion": 4
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "transfer_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "invalid_target_mode",
+            "message": "targetMode 必须是 new 或 merge"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034951299-j2b56x",
+        "timestamp": "2026-06-21T09:42:31.299Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /sites"
+        },
+        "operation": "site_create",
+        "entityType": "site",
+        "entityId": "SITE-TEST",
+        "affectedBatches": [],
+        "changes": {
+          "before": {},
+          "after": {}
+        },
+        "details": {
+          "site": {
+            "id": "SITE-TEST",
+            "name": "测试站点",
+            "code": "TEST",
+            "address": "",
+            "isDefault": false,
+            "disabled": false,
+            "createdAt": "2026-06-21T09:42:31.299Z"
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 5,
+            "locVersion": null,
+            "auditVersion": 5
+          },
+          "after": {
+            "dataVersion": 6,
+            "locVersion": null,
+            "auditVersion": 5
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034957881-6iplak",
+        "timestamp": "2026-06-21T09:42:37.881Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "version_conflict",
+        "entityType": "transfer",
+        "entityId": null,
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 7,
+            "locVersion": null,
+            "auditVersion": 6
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "transfer_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "invalid_target_mode",
+            "message": "targetMode 必须是 new 或 merge"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034967143-11p78g",
+        "timestamp": "2026-06-21T09:42:47.143Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "version_conflict",
+        "entityType": "transfer",
+        "entityId": null,
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 7,
+            "locVersion": null,
+            "auditVersion": 7
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "transfer_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "missing_container_or_section",
+            "message": "新建模式必须指定 targetContainer 和 targetSection"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782034977100-ca6nsv",
+        "timestamp": "2026-06-21T09:42:57.100Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "transfer_create",
+        "entityType": "transfer",
+        "entityId": "TRF-1782034977100-1t",
+        "affectedBatches": [],
+        "changes": {
+          "before": {},
+          "after": {}
+        },
+        "details": {
+          "transfer": {
+            "id": "TRF-1782034977100-1t",
+            "sourceSiteId": "SITE-001",
+            "targetSiteId": "SITE-002",
+            "sourceBatchId": "RS-003",
+            "quantity": 50,
+            "status": "created",
+            "targetMode": "new",
+            "targetBatchId": null,
+            "mergeTargetBatchId": null,
+            "targetContainer": "C-冷盒-12",
+            "targetSection": "A1-BK",
+            "targetBoxId": null,
+            "targetSlotIndex": null,
+            "remark": "",
+            "createdAt": "2026-06-21T09:42:57.100Z",
+            "shippedAt": null,
+            "receivedAt": null,
+            "cancelledAt": null,
+            "createdBy": null,
+            "shippedBy": null,
+            "receivedBy": null,
+            "cancelledBy": null
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 7,
+            "locVersion": null,
+            "auditVersion": 8
+          },
+          "after": {
+            "dataVersion": 8,
+            "locVersion": null,
+            "auditVersion": 8
+          }
+        }
+      },
+      {
+        "id": "AUD-1782035024434-ry8w2r",
+        "timestamp": "2026-06-21T09:43:44.434Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试备注更新",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:43:44.434Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 8,
+            "locVersion": null,
+            "auditVersion": 9
+          },
+          "after": {
+            "dataVersion": 9,
+            "locVersion": null,
+            "auditVersion": 9
+          }
+        }
+      },
+      {
+        "id": "AUD-1782035392116-yn62b0",
+        "timestamp": "2026-06-21T09:49:52.116Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:43:44.434Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:49:52.115Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 9,
+            "locVersion": null,
+            "auditVersion": 10
+          },
+          "after": {
+            "dataVersion": 10,
+            "locVersion": null,
+            "auditVersion": 10
+          }
+        }
+      },
+      {
+        "id": "AUD-1782035561949-szm9jd",
+        "timestamp": "2026-06-21T09:52:41.949Z",
+        "operator": "test-user",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches"
+        },
+        "operation": "batch_create",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-1782035561949"
+        ],
+        "changes": {
+          "before": {
+            "RS-1782035561949": null
+          },
+          "after": {
+            "RS-1782035561949": {
+              "id": "RS-1782035561949",
+              "siteId": "SITE-001",
+              "species": "测试重构物种",
+              "collectionPlace": "测试产地",
+              "viability": "unknown",
+              "quantity": 100,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "",
+              "transactionsCount": 1,
+              "temperaturesCount": 0,
+              "germinationsCount": 0,
+              "reviewsCount": 0,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {
+          "batch": {
+            "id": "RS-1782035561949",
+            "siteId": "SITE-001",
+            "species": "测试重构物种",
+            "collectionPlace": "测试产地",
+            "viability": "unknown",
+            "quantity": 100,
+            "status": "active",
+            "lineage": {
+              "splitFrom": null,
+              "splitTo": [],
+              "mergedFrom": [],
+              "mergedInto": null
+            },
+            "temperatures": [],
+            "transactions": [
+              {
+                "id": "TX-1782035561949",
+                "at": "2026-06-21T09:52:41.949Z",
+                "type": "collect",
+                "quantity": 100,
+                "balance": 100,
+                "note": "新批次入库"
+              }
+            ],
+            "germinations": [],
+            "frozenQuantity": 0,
+            "reservations": [],
+            "remark": "",
+            "reviews": [],
+            "anomalies": []
+          }
+        },
+        "versions": {
+          "before": {
+            "dataVersion": 10,
+            "locVersion": null,
+            "auditVersion": 11
+          },
+          "after": {
+            "dataVersion": 11,
+            "locVersion": null,
+            "auditVersion": 11
+          }
+        }
+      },
+      {
+        "id": "AUD-1782035620679-r8yewr",
+        "timestamp": "2026-06-21T09:53:40.679Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:49:52.115Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:53:40.678Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 11,
+            "locVersion": null,
+            "auditVersion": 12
+          },
+          "after": {
+            "dataVersion": 12,
+            "locVersion": null,
+            "auditVersion": 12
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036077063-0yfdpz",
+        "timestamp": "2026-06-21T10:01:17.063Z",
+        "operator": "isolated-test",
+        "source": {
+          "ip": "test",
+          "userAgent": "test",
+          "endpoint": "test"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 12,
+            "locVersion": null,
+            "auditVersion": 13
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "version_mismatch",
+          "originalOperation": "batch_update_remark",
+          "originalDetails": {},
+          "conflict": {
+            "error": "version_conflict",
+            "message": "rare-seeds 数据版本不匹配，数据已被其他操作修改，请重试",
+            "dataType": "rare-seeds",
+            "expectedVersion": 11,
+            "currentVersion": 12,
+            "retryable": true
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036119052-48lv4g",
+        "timestamp": "2026-06-21T10:01:59.052Z",
+        "operator": "test-operator",
+        "source": "api:test",
+        "operation": "batch_update_remark",
+        "entityType": "batch",
+        "entityId": "RS-001",
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T09:53:40.678Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          },
+          "after": {
+            "RS-001": {
+              "id": "RS-001",
+              "siteId": "SITE-001",
+              "species": "独叶草",
+              "collectionPlace": "西岭北坡",
+              "container": "C-冷盒-08",
+              "section": "A2",
+              "viability": "high",
+              "quantity": 1800,
+              "status": "active",
+              "frozenQuantity": 0,
+              "remark": "测试更新 - 2026-06-21T10:01:59.052Z",
+              "transactionsCount": 1,
+              "temperaturesCount": 5,
+              "germinationsCount": 4,
+              "reviewsCount": 2,
+              "reservationsCount": 0,
+              "anomaliesCount": 0
+            }
+          }
+        },
+        "details": {},
+        "versions": {
+          "before": {
+            "dataVersion": 12,
+            "locVersion": null,
+            "auditVersion": 14
+          },
+          "after": {
+            "dataVersion": 13,
+            "locVersion": null,
+            "auditVersion": 14
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036230005-u3ubkt",
+        "timestamp": "2026-06-21T10:03:50.005Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 15
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "insufficient_batches",
+            "message": "合并至少需要2个批次"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036230083-g2twmi",
+        "timestamp": "2026-06-21T10:03:50.083Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /batches/merge"
+        },
+        "operation": "version_conflict",
+        "entityType": "batch",
+        "entityId": null,
+        "affectedBatches": [
+          "RS-001",
+          "RS-004"
+        ],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": 2,
+            "auditVersion": 16
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "batch_merge",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "merge_site_mismatch",
+            "message": "合并批次必须来自同一站点",
+            "batchSite": "SITE-002",
+            "expectedSite": "SITE-001"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036230204-x4d22z",
+        "timestamp": "2026-06-21T10:03:50.204Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "version_conflict",
+        "entityType": "transfer",
+        "entityId": null,
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": null,
+            "auditVersion": 17
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "transfer_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "same_site_transfer",
+            "message": "源站点和目标站点不能相同"
+          }
+        }
+      },
+      {
+        "id": "AUD-1782036230296-cib2ih",
+        "timestamp": "2026-06-21T10:03:50.296Z",
+        "operator": "系统自动",
+        "source": {
+          "ip": "unknown",
+          "userAgent": "curl/8.7.1",
+          "endpoint": "POST /transfers"
+        },
+        "operation": "version_conflict",
+        "entityType": "transfer",
+        "entityId": null,
+        "affectedBatches": [],
+        "changes": {
+          "before": {
+            "dataVersion": 13,
+            "locVersion": null,
+            "auditVersion": 18
+          },
+          "after": null
+        },
+        "details": {
+          "conflictType": "mutator_error",
+          "originalOperation": "transfer_create",
+          "originalDetails": {},
+          "mutatorError": {
+            "error": "missing_merge_target",
+            "message": "合并模式必须指定 mergeTargetBatchId"
+          }
+        }
+      }
+    ]
   }
 }
