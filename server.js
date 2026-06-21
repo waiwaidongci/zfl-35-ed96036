@@ -21,6 +21,7 @@ import {
   OPERATION,
   clone,
   getRequestContext,
+  getExpectedVersionsFromRequest,
   filterBatchesBySite,
   getDefaultSiteId,
   listSites,
@@ -45,6 +46,20 @@ function send(res, status, data) {
   res.end(JSON.stringify(data, null, 2));
 }
 
+function mutationStatus(result, fallback = 409) {
+  if (!result || !result.error) return null;
+  const statusMap = {
+    batch_not_found: 404,
+    site_not_found: 404,
+    version_conflict: 409,
+    transaction_failed: 409,
+    invalid_quantity: 400,
+    negative_inventory_blocked: 409,
+    insufficient_available_quantity: 409
+  };
+  return statusMap[result.error] || fallback;
+}
+
 function extractOperator(req, input) {
   if (input && input.operator) return input.operator;
   const headers = (req && req.headers) || {};
@@ -54,7 +69,8 @@ function extractOperator(req, input) {
 function makeCtx(req, input) {
   return {
     operator: extractOperator(req, input),
-    source: getRequestContext(req)
+    source: getRequestContext(req),
+    expectedVersions: getExpectedVersionsFromRequest(req, input)
   };
 }
 
@@ -102,7 +118,8 @@ const server = http.createServer(async (req, res) => {
     const auditHandled = await handleAuditRoutes(req, res, send, body);
     if (auditHandled) return;
 
-    const db = await loadDb();
+    const dbResult = await loadDbWithVersion();
+    const db = dbResult.data;
     if (req.method === "GET" && url.pathname === "/") {
       const endpoints = [
         "GET /version",
@@ -390,6 +407,10 @@ const server = http.createServer(async (req, res) => {
               ? `按指定站点 ${effectiveSiteId} 筛选`
               : `未传 siteId，使用默认站点 ${effectiveSiteId}`
         },
+        versions: {
+          dataVersion: dbResult.version,
+          dataUpdatedAt: dbResult.updatedAt
+        },
         total: rows.length,
         batches: rows
       });
@@ -408,6 +429,7 @@ const server = http.createServer(async (req, res) => {
         entityId: input.id || null,
         operator: ctx.operator,
         source: ctx.source,
+        expectedVersions: ctx.expectedVersions,
         affectedBatchIds: [],
         details: {},
         mutator: (dbInner) => {
@@ -490,7 +512,13 @@ const server = http.createServer(async (req, res) => {
         if (batch.lineage.transferredFrom === undefined) batch.lineage.transferredFrom = null;
         if (!batch.lineage.transferredTo) batch.lineage.transferredTo = [];
         batch.trendSummary = getBatchTrendSummary(batch);
-        return send(res, 200, batch);
+        return send(res, 200, {
+          versions: {
+            dataVersion: dbResult.version,
+            dataUpdatedAt: dbResult.updatedAt
+          },
+          batch
+        });
       }
 
       const input = await body(req);
@@ -503,6 +531,7 @@ const server = http.createServer(async (req, res) => {
           entityId: batch.id,
           operator: ctx.operator,
           source: ctx.source,
+          expectedVersions: ctx.expectedVersions,
           affectedBatchIds: [batch.id],
           details: {},
           mutator: (dbInner) => {
@@ -520,7 +549,7 @@ const server = http.createServer(async (req, res) => {
             };
           }
         });
-        if (result.error) return send(res, 409, result);
+        if (result.error) return send(res, mutationStatus(result), result);
         return send(res, 201, result);
       }
 
@@ -532,6 +561,7 @@ const server = http.createServer(async (req, res) => {
           entityId: batch.id,
           operator: ctx.operator,
           source: ctx.source,
+          expectedVersions: ctx.expectedVersions,
           affectedBatchIds: [batch.id],
           details: {},
           mutator: (dbInner) => {
@@ -547,6 +577,7 @@ const server = http.createServer(async (req, res) => {
           }
         });
 
+        if (result.error) return send(res, mutationStatus(result), result);
         const scanResult = await scanAndDetectAnomalies(batch.id);
         return send(res, 201, {
           batch,
@@ -572,6 +603,7 @@ const server = http.createServer(async (req, res) => {
           entityId: batch.id,
           operator: ctx.operator,
           source: ctx.source,
+          expectedVersions: ctx.expectedVersions,
           affectedBatchIds: [batch.id],
           details: {},
           mutator: (dbInner) => {
@@ -597,7 +629,7 @@ const server = http.createServer(async (req, res) => {
           }
         });
 
-        if (result.error) return send(res, 409, result);
+        if (result.error) return send(res, mutationStatus(result), result);
         return send(res, 201, result.batch || result);
       }
 
@@ -609,6 +641,7 @@ const server = http.createServer(async (req, res) => {
           entityId: batch.id,
           operator: ctx.operator,
           source: ctx.source,
+          expectedVersions: ctx.expectedVersions,
           affectedBatchIds: [batch.id],
           details: {},
           mutator: (dbInner) => {
@@ -623,6 +656,7 @@ const server = http.createServer(async (req, res) => {
             };
           }
         });
+        if (result.error) return send(res, mutationStatus(result), result);
         return send(res, 200, result);
       }
 
@@ -647,6 +681,7 @@ const server = http.createServer(async (req, res) => {
           entityId: batch.id,
           operator: review.reviewer !== "未知管理员" ? review.reviewer : ctx.operator,
           source: ctx.source,
+          expectedVersions: ctx.expectedVersions,
           affectedBatchIds: [batch.id],
           details: {},
           mutator: (dbInner) => {
@@ -662,6 +697,7 @@ const server = http.createServer(async (req, res) => {
             };
           }
         });
+        if (result.error) return send(res, mutationStatus(result), result);
         return send(res, 201, result);
       }
     }

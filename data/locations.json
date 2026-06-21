@@ -1,6 +1,6 @@
 {
-  "_version": 2,
-  "_updatedAt": "2026-06-21T08:03:21.376Z",
+  "_version": 1,
+  "_updatedAt": "2026-06-21T07:37:20.693Z",
   "_dataType": "locations",
   "data": {
     "sites": [
@@ -58,7 +58,7 @@
               },
               {
                 "index": 2,
-                "batchId": "RS-001"
+                "batchId": null
               },
               {
                 "index": 3,

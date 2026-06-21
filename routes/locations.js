@@ -1,11 +1,12 @@
 import * as store from "../lib/location-store.js";
-import { getRequestContext } from "../lib/data-store.js";
+import { getExpectedVersionsFromRequest, getRequestContext } from "../lib/data-store.js";
 
 function makeCtx(req, input = {}) {
   const headers = req.headers || {};
   return {
     operator: input.operator || headers["x-operator"] || headers["x-user"] || null,
-    source: getRequestContext(req)
+    source: getRequestContext(req),
+    expectedVersions: getExpectedVersionsFromRequest(req, input)
   };
 }
 

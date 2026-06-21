@@ -1,12 +1,13 @@
 import * as store from "../lib/reservation-store.js";
-import { getRequestContext } from "../lib/data-store.js";
+import { getExpectedVersionsFromRequest, getRequestContext } from "../lib/data-store.js";
 
 function makeCtx(req, body) {
   const headers = (req && req.headers) || {};
   const operator = (body && body.operator) || headers["x-operator"] || headers["x-user"] || undefined;
   return {
     operator,
-    source: getRequestContext(req)
+    source: getRequestContext(req),
+    expectedVersions: getExpectedVersionsFromRequest(req, body)
   };
 }
 
