@@ -46,6 +46,7 @@ export async function handleLocationRoutes(req, res, send, readBody) {
         box_already_exists: 409,
         slot_already_occupied: 409,
         slot_index_out_of_range: 400,
+        site_disabled: 409
       };
       send(res, statusMap[result.error] || 400, result);
       return true;

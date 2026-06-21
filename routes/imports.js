@@ -30,7 +30,8 @@ const errorStatusMap = {
   token_not_found: 404,
   token_expired: 410,
   data_changed_since_preview: 409,
-  no_importable_rows: 409
+  no_importable_rows: 409,
+  site_disabled: 409
 };
 
 export async function handleImportRoutes(req, res, send, readBody) {

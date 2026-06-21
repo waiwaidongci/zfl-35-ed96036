@@ -24,6 +24,8 @@ import {
   getSite,
   getDefaultSite,
   createSite,
+  updateSite,
+  isSiteDisabled,
   DEFAULT_SITE_ID
 } from "./lib/data-store.js";
 
@@ -97,6 +99,7 @@ const server = http.createServer(async (req, res) => {
         "GET /sites",
         "GET /sites/:id",
         "POST /sites",
+        "PATCH /sites/:id",
         "GET /batches?siteId=&species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=",
         "POST /batches",
         "GET /batches/:id",
@@ -172,6 +175,21 @@ const server = http.createServer(async (req, res) => {
       return send(res, 201, result.site || result);
     }
 
+    if (req.method === "PATCH" && url.pathname.startsWith("/sites/")) {
+      const siteId = decodeURIComponent(url.pathname.slice("/sites/".length));
+      const input = await body(req);
+      const ctx = makeCtx(req, input);
+      const result = await updateSite(siteId, input, ctx);
+      if (result.error) {
+        const statusMap = {
+          site_not_found: 404,
+          default_site_cannot_disable: 409
+        };
+        return send(res, statusMap[result.error] || 400, result);
+      }
+      return send(res, 200, result.site || result);
+    }
+
     if (req.method === "POST" && url.pathname === "/batches/merge") {
       const input = await body(req);
       const result = await mergeBatches(input.batchIds, input.target, makeCtx(req, input));
@@ -244,6 +262,10 @@ const server = http.createServer(async (req, res) => {
         affectedBatchIds: [],
         details: {},
         mutator: (dbInner) => {
+          const targetSite = (dbInner.sites || []).find(s => s.id === batchSiteId);
+          if (isSiteDisabled(targetSite)) {
+            return { error: "site_disabled", message: `站点 ${targetSite ? targetSite.name : batchSiteId} 已停用，无法创建批次`, siteId: batchSiteId };
+          }
           const batch = {
             id: input.id || `RS-${Date.now()}`,
             siteId: batchSiteId,
@@ -283,6 +305,9 @@ const server = http.createServer(async (req, res) => {
         }
       });
 
+      if (result.error) {
+        return send(res, result.error === "site_disabled" ? 409 : 400, result);
+      }
       return send(res, 201, result.batch || result);
     }
 

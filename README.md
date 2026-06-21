@@ -36,6 +36,7 @@ npm start
 | GET | `/sites` | 列出所有站点 |
 | GET | `/sites/:id` | 获取单个站点详情 |
 | POST | `/sites` | 创建新站点 |
+| PATCH | `/sites/:id` | 修改站点信息（名称、代码、地址、停用状态） |
 | GET | `/batches?siteId=` | 按站点筛选批次列表 |
 | POST | `/batches` | 创建批次（支持 siteId 字段） |
 | GET | `/reports/inventory?siteId=` | 库存报告（支持站点隔离和全局汇总） |
@@ -135,6 +136,9 @@ curl "http://localhost:3035/reports/inventory?siteId=all"
 - 批次拆分时，子批次自动继承来源批次的站点
 - 批量导入时，未指定 `siteId` 的行自动归属默认站点
 - 审计日志按站点筛选时，仅返回涉及该站点批次的操作记录
+- **默认站点不能被停用**
+- 已停用的站点不能：创建新批次、导入批次、新增库位分区、分配批次到库位
+- 已停用站点的历史批次、审计日志、库存报告仍可正常查询
 
 
 ## 批次备注与人工复核模块
