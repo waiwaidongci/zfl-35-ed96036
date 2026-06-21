@@ -11,6 +11,7 @@ import { handleAuditRoutes } from "./routes/audit.js";
 import { getInventoryWithFrozen } from "./lib/reservation-store.js";
 import { scanAndDetectAnomalies } from "./lib/temperature-anomaly.js";
 import { splitBatch, mergeBatches, ensureLineageFields } from "./lib/batch-lineage.js";
+import { createTransfer, shipTransfer, receiveTransfer, cancelTransfer, getTransfer, listTransfers } from "./lib/transfer-store.js";
 import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability, filterBatchesByRetestPriority } from "./lib/viability-trend.js";
 import {
   loadDb,
@@ -58,8 +59,8 @@ function makeCtx(req, input) {
 function applyTransaction(batch, input) {
   ensureLineageFields(batch);
   const qty = Number(input.quantity || 0);
-  const negative = ["sample", "lend", "destroy", "split_out", "merge_out"].includes(input.type);
-  const positive = ["collect", "return", "split_in", "merge_in"].includes(input.type);
+  const negative = ["sample", "lend", "destroy", "split_out", "merge_out", "transfer_out"].includes(input.type);
+  const positive = ["collect", "return", "split_in", "merge_in", "transfer_in"].includes(input.type);
   const next = batch.quantity + (positive ? qty : negative ? -qty : 0);
   if (next < 0) return { error: "negative_inventory_blocked" };
   batch.quantity = next;
@@ -120,6 +121,12 @@ const server = http.createServer(async (req, res) => {
         "POST /batches/:id/reservations/:reservationId/fulfill",
         "POST /batches/:id/split",
         "POST /batches/merge",
+        "POST /transfers",
+        "GET /transfers?status=&sourceSiteId=&targetSiteId=&siteId=&sourceBatchId=&targetBatchId=&targetMode=",
+        "GET /transfers/:id",
+        "PATCH /transfers/:id/ship",
+        "PATCH /transfers/:id/receive",
+        "PATCH /transfers/:id/cancel",
         "GET /anomalies/pending?siteId=",
         "GET /batches/:id/anomalies?status=",
         "PATCH /batches/:id/anomalies/:anomalyId/handle",
@@ -206,6 +213,104 @@ const server = http.createServer(async (req, res) => {
       return send(res, 201, result);
     }
 
+    if (req.method === "POST" && url.pathname === "/transfers") {
+      const input = await body(req);
+      const ctx = makeCtx(req, input);
+      const result = await createTransfer(input, ctx);
+      if (result.error) {
+        const statusMap = {
+          batch_not_found: 404,
+          source_site_not_found: 404,
+          target_site_not_found: 404,
+          merge_target_not_found: 404
+        };
+        return send(res, statusMap[result.error] || 400, result);
+      }
+      return send(res, 201, result.transfer || result);
+    }
+
+    if (req.method === "GET" && url.pathname === "/transfers") {
+      const filters = {
+        status: url.searchParams.get("status") || "",
+        sourceSiteId: url.searchParams.get("sourceSiteId") || "",
+        targetSiteId: url.searchParams.get("targetSiteId") || "",
+        siteId: url.searchParams.get("siteId") || "",
+        sourceBatchId: url.searchParams.get("sourceBatchId") || "",
+        targetBatchId: url.searchParams.get("targetBatchId") || "",
+        targetMode: url.searchParams.get("targetMode") || ""
+      };
+      const hasFilters = Object.values(filters).some(v => v);
+      const result = await listTransfers(hasFilters ? filters : {});
+      return send(res, 200, result);
+    }
+
+    const transferMatch = url.pathname.match(/^\/transfers\/([^/]+)(?:\/([^/]+))?$/);
+    if (transferMatch) {
+      const transferId = decodeURIComponent(transferMatch[1]);
+      const action = transferMatch[2];
+
+      if (req.method === "GET" && !action) {
+        const result = await getTransfer(transferId);
+        if (result.error) {
+          return send(res, 404, result);
+        }
+        return send(res, 200, result.transfer);
+      }
+
+      const input = await body(req);
+      const ctx = makeCtx(req, input);
+
+      if (req.method === "PATCH" && action === "ship") {
+        const result = await shipTransfer(transferId, ctx);
+        if (result.error) {
+          const statusMap = {
+            transfer_not_found: 404,
+            batch_not_found: 404,
+            invalid_status_transition: 409,
+            insufficient_available_quantity: 409,
+            batch_not_active: 409
+          };
+          return send(res, statusMap[result.error] || 400, result);
+        }
+        return send(res, 200, result);
+      }
+
+      if (req.method === "PATCH" && action === "receive") {
+        const result = await receiveTransfer(transferId, input, ctx);
+        if (result.error) {
+          const statusMap = {
+            transfer_not_found: 404,
+            batch_not_found: 404,
+            merge_target_not_found: 404,
+            invalid_status_transition: 409,
+            box_not_found: 404,
+            site_mismatch: 409,
+            section_box_mismatch: 409,
+            slot_index_out_of_range: 400,
+            slot_already_occupied: 409,
+            transfer_merge_mismatch: 409,
+            merge_target_not_active: 409,
+            merge_target_site_mismatch: 409,
+            inconsistent_in_transit_quantity: 500
+          };
+          return send(res, statusMap[result.error] || 400, result);
+        }
+        return send(res, 200, result);
+      }
+
+      if (req.method === "PATCH" && action === "cancel") {
+        const result = await cancelTransfer(transferId, ctx);
+        if (result.error) {
+          const statusMap = {
+            transfer_not_found: 404,
+            invalid_status_transition: 409
+          };
+          return send(res, statusMap[result.error] || 400, result);
+        }
+        return send(res, 200, result);
+      }
+    }
+
     if (req.method === "GET" && url.pathname === "/batches") {
       const defaultId = getDefaultSiteId(db);
       const siteIdParam = url.searchParams.get("siteId");
@@ -242,6 +347,10 @@ const server = http.createServer(async (req, res) => {
       }
       for (const batch of rows) {
         ensureLineageFields(batch);
+        if (batch.frozenQuantity === undefined || batch.frozenQuantity === null) batch.frozenQuantity = 0;
+        if (batch.inTransitQuantity === undefined || batch.inTransitQuantity === null) batch.inTransitQuantity = 0;
+        if (!batch.lineage.transferredFrom) batch.lineage.transferredFrom = null;
+        if (!batch.lineage.transferredTo) batch.lineage.transferredTo = [];
         batch.trendSummary = getBatchTrendSummary(batch);
       }
       return send(res, 200, {
@@ -346,7 +455,11 @@ const server = http.createServer(async (req, res) => {
         if (batch.remark === undefined) batch.remark = "";
         if (!batch.reservations) batch.reservations = [];
         if (batch.frozenQuantity === undefined || batch.frozenQuantity === null) batch.frozenQuantity = 0;
+        if (batch.inTransitQuantity === undefined || batch.inTransitQuantity === null) batch.inTransitQuantity = 0;
         if (!batch.anomalies) batch.anomalies = [];
+        if (!batch.lineage) batch.lineage = { splitFrom: null, splitTo: [], mergedFrom: [], mergedInto: null };
+        if (batch.lineage.transferredFrom === undefined) batch.lineage.transferredFrom = null;
+        if (!batch.lineage.transferredTo) batch.lineage.transferredTo = [];
         batch.trendSummary = getBatchTrendSummary(batch);
         return send(res, 200, batch);
       }

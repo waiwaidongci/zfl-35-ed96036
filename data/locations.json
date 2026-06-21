@@ -145,7 +145,12 @@
           "id": "C-冷盒-11",
           "name": "备库冷盒11",
           "slotCapacity": 16,
-          "slots": []
+          "slots": [
+            {
+              "index": 1,
+              "batchId": "RS-001-T-9483"
+            }
+          ]
         }
       ],
       "temperatureThreshold": null

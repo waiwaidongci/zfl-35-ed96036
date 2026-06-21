@@ -618,6 +618,1020 @@
         "sectionId": "A3",
         "threshold": null
       }
+    },
+    {
+      "id": "AUD-1782023634575-psqe51",
+      "timestamp": "2026-06-21T06:33:54.575Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023634575-p4",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023634575-p4",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 500,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": "C-冷盒-11",
+          "targetSlotIndex": 1,
+          "remark": "测试跨站点调拨",
+          "createdAt": "2026-06-21T06:33:54.575Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023669352-0r9s9i",
+      "timestamp": "2026-06-21T06:34:29.352Z",
+      "operator": "ä»åºç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023634575-p4/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023634575-p4",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023634575-p4",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 500,
+          "status": "shipped",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": "C-冷盒-11",
+          "targetSlotIndex": 1,
+          "remark": "测试跨站点调拨",
+          "createdAt": "2026-06-21T06:33:54.575Z",
+          "shippedAt": "2026-06-21T06:34:29.352Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ä»åºç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-001",
+          "inTransitQuantityAfter": 500,
+          "availableQuantityAfter": 1300
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023689484-1bmur7",
+      "timestamp": "2026-06-21T06:34:49.484Z",
+      "operator": "ç®æ ç«ç¹ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023634575-p4/receive"
+      },
+      "operation": "transfer_receive",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023634575-p4",
+      "affectedBatches": [
+        "RS-001-T-9483",
+        "RS-001-T-9483"
+      ],
+      "changes": {
+        "before": {
+          "RS-001-T-9483": null
+        },
+        "after": {
+          "RS-001-T-9483": {
+            "id": "RS-001-T-9483",
+            "siteId": "SITE-002",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-11",
+            "section": "A3-BK",
+            "viability": "high",
+            "quantity": 500,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 0,
+            "remark": "从站点 SITE-001 批次 RS-001 调拨入库",
+            "transactionsCount": 1,
+            "temperaturesCount": 0,
+            "germinationsCount": 0,
+            "reviewsCount": 0,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          }
+        }
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023634575-p4",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 500,
+          "status": "received",
+          "targetMode": "new",
+          "targetBatchId": "RS-001-T-9483",
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": "C-冷盒-11",
+          "targetSlotIndex": 1,
+          "remark": "测试跨站点调拨",
+          "createdAt": "2026-06-21T06:33:54.575Z",
+          "shippedAt": "2026-06-21T06:34:29.352Z",
+          "receivedAt": "2026-06-21T06:34:49.483Z",
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ä»åºç®¡çå",
+          "receivedBy": "ç®æ ç«ç¹ç®¡çå",
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-001",
+          "quantityAfter": 1300,
+          "inTransitQuantityAfter": 0,
+          "statusAfter": "active",
+          "transaction": {
+            "id": "TX-1782023689483-38vc",
+            "at": "2026-06-21T06:34:49.483Z",
+            "type": "transfer_out",
+            "quantity": 500,
+            "balance": 1300,
+            "note": "调拨到站点 SITE-002 批次 RS-001-T-9483，数量 500 粒，调拨单 TRF-1782023634575-p4"
+          }
+        },
+        "targetBatch": {
+          "id": "RS-001-T-9483",
+          "siteId": "SITE-002",
+          "species": "独叶草",
+          "collectionPlace": "西岭北坡",
+          "motherPlant": "MP-17",
+          "container": "C-冷盒-11",
+          "section": "A3-BK",
+          "viability": "high",
+          "quantity": 500,
+          "status": "active",
+          "lineage": {
+            "splitFrom": null,
+            "splitTo": [],
+            "mergedFrom": [],
+            "mergedInto": null,
+            "transferredFrom": "RS-001",
+            "transferredTo": []
+          },
+          "temperatures": [],
+          "transactions": [
+            {
+              "id": "TX-1782023689483-qgb4",
+              "at": "2026-06-21T06:34:49.483Z",
+              "type": "transfer_in",
+              "quantity": 500,
+              "balance": 500,
+              "note": "从站点 SITE-001 批次 RS-001 调拨入库，数量 500 粒，调拨单 TRF-1782023634575-p4"
+            }
+          ],
+          "germinations": [],
+          "frozenQuantity": 0,
+          "inTransitQuantity": 0,
+          "reservations": [],
+          "remark": "从站点 SITE-001 批次 RS-001 调拨入库",
+          "reviews": [],
+          "anomalies": []
+        },
+        "transferSlotAssignment": {
+          "boxId": "C-冷盒-11",
+          "boxName": "备库冷盒11",
+          "slotIndex": 1,
+          "sectionId": "A3-BK",
+          "sectionName": "A3备库中温区",
+          "siteId": "SITE-002",
+          "batchId": "RS-001-T-9483",
+          "changeType": "assign",
+          "changeNote": "调拨目标批次 RS-001-T-9483 分配到 A3备库中温区 / 备库冷盒11 / 格位1"
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023791968-ku6xe6",
+      "timestamp": "2026-06-21T06:36:31.968Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023791968-jd",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023791968-jd",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-002",
+          "quantity": 100,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试取消调拨",
+          "createdAt": "2026-06-21T06:36:31.968Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023792036-r7icy7",
+      "timestamp": "2026-06-21T06:36:32.036Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023791968-jd/cancel"
+      },
+      "operation": "transfer_cancel",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023791968-jd",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023791968-jd",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-002",
+          "quantity": 100,
+          "status": "cancelled",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试取消调拨",
+          "createdAt": "2026-06-21T06:36:31.968Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": "2026-06-21T06:36:32.036Z",
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": "ç®¡çå"
+        },
+        "sourceBatch": null
+      }
+    },
+    {
+      "id": "AUD-1782023803123-906x3a",
+      "timestamp": "2026-06-21T06:36:43.123Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023803123-jr",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023803123-jr",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 50,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试发出后取消",
+          "createdAt": "2026-06-21T06:36:43.123Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023803191-a30wcp",
+      "timestamp": "2026-06-21T06:36:43.191Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023803123-jr/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023803123-jr",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023803123-jr",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 50,
+          "status": "shipped",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试发出后取消",
+          "createdAt": "2026-06-21T06:36:43.123Z",
+          "shippedAt": "2026-06-21T06:36:43.191Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-003",
+          "inTransitQuantityAfter": 50,
+          "availableQuantityAfter": 2150
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023803225-nfrc9t",
+      "timestamp": "2026-06-21T06:36:43.225Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023803123-jr/cancel"
+      },
+      "operation": "transfer_cancel",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023803123-jr",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023803123-jr",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 50,
+          "status": "cancelled",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试发出后取消",
+          "createdAt": "2026-06-21T06:36:43.123Z",
+          "shippedAt": "2026-06-21T06:36:43.191Z",
+          "receivedAt": null,
+          "cancelledAt": "2026-06-21T06:36:43.225Z",
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": "ç®¡çå"
+        },
+        "sourceBatch": {
+          "id": "RS-003",
+          "inTransitQuantityAfter": 0,
+          "availableQuantityAfter": 2200
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023832991-zzfvvo",
+      "timestamp": "2026-06-21T06:37:12.991Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023832991-59",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023832991-59",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 200,
+          "status": "created",
+          "targetMode": "merge",
+          "targetBatchId": null,
+          "mergeTargetBatchId": "RS-001-T-9483",
+          "targetContainer": null,
+          "targetSection": null,
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试合并模式-同物种",
+          "createdAt": "2026-06-21T06:37:12.991Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023850330-h8ioye",
+      "timestamp": "2026-06-21T06:37:30.330Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023832991-59/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023832991-59",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023832991-59",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 200,
+          "status": "shipped",
+          "targetMode": "merge",
+          "targetBatchId": null,
+          "mergeTargetBatchId": "RS-001-T-9483",
+          "targetContainer": null,
+          "targetSection": null,
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试合并模式-同物种",
+          "createdAt": "2026-06-21T06:37:12.991Z",
+          "shippedAt": "2026-06-21T06:37:30.330Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-001",
+          "inTransitQuantityAfter": 200,
+          "availableQuantityAfter": 1100
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023850384-zg4sch",
+      "timestamp": "2026-06-21T06:37:30.384Z",
+      "operator": "ç®æ ç«ç¹ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023832991-59/receive"
+      },
+      "operation": "transfer_receive",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023832991-59",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023832991-59",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-001",
+          "quantity": 200,
+          "status": "received",
+          "targetMode": "merge",
+          "targetBatchId": "RS-001-T-9483",
+          "mergeTargetBatchId": "RS-001-T-9483",
+          "targetContainer": null,
+          "targetSection": null,
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试合并模式-同物种",
+          "createdAt": "2026-06-21T06:37:12.991Z",
+          "shippedAt": "2026-06-21T06:37:30.330Z",
+          "receivedAt": "2026-06-21T06:37:30.384Z",
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": "ç®æ ç«ç¹ç®¡çå",
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-001",
+          "quantityAfter": 1100,
+          "inTransitQuantityAfter": 0,
+          "statusAfter": "active",
+          "transaction": {
+            "id": "TX-1782023850384-7okt",
+            "at": "2026-06-21T06:37:30.384Z",
+            "type": "transfer_out",
+            "quantity": 200,
+            "balance": 1100,
+            "note": "调拨到站点 SITE-002 批次 RS-001-T-9483（合并），数量 200 粒，调拨单 TRF-1782023832991-59"
+          }
+        },
+        "targetBatch": {
+          "id": "RS-001-T-9483",
+          "quantityAfter": 700,
+          "transaction": {
+            "id": "TX-1782023850384-57td",
+            "at": "2026-06-21T06:37:30.384Z",
+            "type": "transfer_in",
+            "quantity": 200,
+            "balance": 700,
+            "note": "从站点 SITE-001 批次 RS-001 调拨合并入库，数量 200 粒，调拨单 TRF-1782023832991-59"
+          }
+        },
+        "mergeMode": true
+      }
+    },
+    {
+      "id": "AUD-1782023884116-pgwz96",
+      "timestamp": "2026-06-21T06:38:04.116Z",
+      "operator": "æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023884116-ku",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023884116-ku",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-002",
+          "quantity": 150,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试在途数量统计",
+          "createdAt": "2026-06-21T06:38:04.116Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782023884157-g60sf8",
+      "timestamp": "2026-06-21T06:38:04.157Z",
+      "operator": "ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782023884116-ku/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782023884116-ku",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782023884116-ku",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-002",
+          "quantity": 150,
+          "status": "shipped",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "测试在途数量统计",
+          "createdAt": "2026-06-21T06:38:04.116Z",
+          "shippedAt": "2026-06-21T06:38:04.157Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "æµè¯å",
+          "shippedBy": "ç®¡çå",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-002",
+          "inTransitQuantityAfter": 150,
+          "availableQuantityAfter": 800
+        }
+      }
+    },
+    {
+      "id": "AUD-1782024238527-tnic49",
+      "timestamp": "2026-06-21T06:43:58.527Z",
+      "operator": "å®¡è®¡æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "POST /transfers"
+      },
+      "operation": "transfer_create",
+      "entityType": "transfer",
+      "entityId": "TRF-1782024238527-32",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782024238527-32",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 30,
+          "status": "created",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "审计日志测试",
+          "createdAt": "2026-06-21T06:43:58.527Z",
+          "shippedAt": null,
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "å®¡è®¡æµè¯å",
+          "shippedBy": null,
+          "receivedBy": null,
+          "cancelledBy": null
+        }
+      }
+    },
+    {
+      "id": "AUD-1782024238563-myyl9q",
+      "timestamp": "2026-06-21T06:43:58.563Z",
+      "operator": "å®¡è®¡æµè¯å",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782024238527-32/ship"
+      },
+      "operation": "transfer_ship",
+      "entityType": "transfer",
+      "entityId": "TRF-1782024238527-32",
+      "affectedBatches": [
+        "RS-003"
+      ],
+      "changes": {
+        "before": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          }
+        },
+        "after": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 30,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          }
+        }
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782024238527-32",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 30,
+          "status": "shipped",
+          "targetMode": "new",
+          "targetBatchId": null,
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "审计日志测试",
+          "createdAt": "2026-06-21T06:43:58.527Z",
+          "shippedAt": "2026-06-21T06:43:58.563Z",
+          "receivedAt": null,
+          "cancelledAt": null,
+          "createdBy": "å®¡è®¡æµè¯å",
+          "shippedBy": "å®¡è®¡æµè¯å",
+          "receivedBy": null,
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-003",
+          "inTransitQuantityAfter": 30,
+          "availableQuantityAfter": 2170
+        }
+      }
+    },
+    {
+      "id": "AUD-1782024335820-lrmjm5",
+      "timestamp": "2026-06-21T06:45:35.820Z",
+      "operator": "ç®æ ç®¡çå",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /transfers/TRF-1782024238527-32/receive"
+      },
+      "operation": "transfer_receive",
+      "entityType": "transfer",
+      "entityId": "TRF-1782024238527-32",
+      "affectedBatches": [
+        "RS-003",
+        "RS-003-T-5819",
+        "RS-003-T-5819"
+      ],
+      "changes": {
+        "before": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 30,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          },
+          "RS-003-T-5819": null
+        },
+        "after": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2170,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 2,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 5
+          },
+          "RS-003-T-5819": {
+            "id": "RS-003-T-5819",
+            "siteId": "SITE-002",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-11",
+            "section": "A3-BK",
+            "viability": "high",
+            "quantity": 30,
+            "status": "active",
+            "frozenQuantity": 0,
+            "inTransitQuantity": 0,
+            "remark": "从站点 SITE-001 批次 RS-003 调拨入库",
+            "transactionsCount": 1,
+            "temperaturesCount": 0,
+            "germinationsCount": 0,
+            "reviewsCount": 0,
+            "reservationsCount": 0,
+            "anomaliesCount": 0
+          }
+        }
+      },
+      "details": {
+        "transfer": {
+          "id": "TRF-1782024238527-32",
+          "sourceSiteId": "SITE-001",
+          "targetSiteId": "SITE-002",
+          "sourceBatchId": "RS-003",
+          "quantity": 30,
+          "status": "received",
+          "targetMode": "new",
+          "targetBatchId": "RS-003-T-5819",
+          "mergeTargetBatchId": null,
+          "targetContainer": "C-冷盒-11",
+          "targetSection": "A3-BK",
+          "targetBoxId": null,
+          "targetSlotIndex": null,
+          "remark": "审计日志测试",
+          "createdAt": "2026-06-21T06:43:58.527Z",
+          "shippedAt": "2026-06-21T06:43:58.563Z",
+          "receivedAt": "2026-06-21T06:45:35.820Z",
+          "cancelledAt": null,
+          "createdBy": "å®¡è®¡æµè¯å",
+          "shippedBy": "å®¡è®¡æµè¯å",
+          "receivedBy": "ç®æ ç®¡çå",
+          "cancelledBy": null
+        },
+        "sourceBatch": {
+          "id": "RS-003",
+          "quantityAfter": 2170,
+          "inTransitQuantityAfter": 0,
+          "statusAfter": "active",
+          "transaction": {
+            "id": "TX-1782024335820-v5h1",
+            "at": "2026-06-21T06:45:35.820Z",
+            "type": "transfer_out",
+            "quantity": 30,
+            "balance": 2170,
+            "note": "调拨到站点 SITE-002 批次 RS-003-T-5819，数量 30 粒，调拨单 TRF-1782024238527-32"
+          }
+        },
+        "targetBatch": {
+          "id": "RS-003-T-5819",
+          "siteId": "SITE-002",
+          "species": "红豆杉",
+          "collectionPlace": "神农架",
+          "motherPlant": "MP-45",
+          "container": "C-冷盒-11",
+          "section": "A3-BK",
+          "viability": "high",
+          "quantity": 30,
+          "status": "active",
+          "lineage": {
+            "splitFrom": null,
+            "splitTo": [],
+            "mergedFrom": [],
+            "mergedInto": null,
+            "transferredFrom": "RS-003",
+            "transferredTo": []
+          },
+          "temperatures": [],
+          "transactions": [
+            {
+              "id": "TX-1782024335820-kjr5",
+              "at": "2026-06-21T06:45:35.820Z",
+              "type": "transfer_in",
+              "quantity": 30,
+              "balance": 30,
+              "note": "从站点 SITE-001 批次 RS-003 调拨入库，数量 30 粒，调拨单 TRF-1782024238527-32"
+            }
+          ],
+          "germinations": [],
+          "frozenQuantity": 0,
+          "inTransitQuantity": 0,
+          "reservations": [],
+          "remark": "从站点 SITE-001 批次 RS-003 调拨入库",
+          "reviews": [],
+          "anomalies": []
+        }
+      }
     }
   ]
 }
