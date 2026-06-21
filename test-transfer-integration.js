@@ -1159,9 +1159,11 @@ async function main() {
   console.log("  验证项: 批次数量 / 库存流水 / lineage 关系");
   console.log("          transfers 状态 / 审计日志 / 版本号");
   console.log("  数据保护: 每个场景开始前重置为种子数据");
+  console.log("            测试完成后恢复运行前原始数据");
   console.log("═══════════════════════════════════════════════════");
 
   const globalBackups = await backupDataFiles();
+  let exitCode = 0;
 
   try {
     await testCreateTransfer();
@@ -1184,17 +1186,21 @@ async function main() {
         console.log(`  ✗ ${f.name}`);
         console.log(`    ${f.error.message}`);
       }
-      process.exit(1);
+      exitCode = 1;
     } else {
       console.log("\n  所有集成回归测试通过 ✓");
-      process.exit(0);
+      exitCode = 0;
     }
+  } catch (err) {
+    console.error("\n测试运行异常:", err);
+    exitCode = 1;
   } finally {
+    console.log("\n  正在恢复 data/ 目录原始数据文件 ...");
     await restoreDataFiles(globalBackups);
+    console.log("  data/ 目录已恢复 ✓");
   }
+
+  process.exit(exitCode);
 }
 
-main().catch(err => {
-  console.error("测试运行异常:", err);
-  process.exit(1);
-});
+main();
