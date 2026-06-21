@@ -118,7 +118,8 @@ const server = http.createServer(async (req, res) => {
         "GET /batches/:id/anomalies?status=",
         "PATCH /batches/:id/anomalies/:anomalyId/handle",
         "POST /anomalies/scan?batchId=&threshold=&siteId=",
-        "GET /reports/inventory?siteId=",
+        "GET /reservations?status=&applicant=&plannedDateFrom=&plannedDateTo=&siteId=",
+        "GET /reports/inventory?siteId=&applicant=&plannedDateFrom=&plannedDateTo=",
         "GET /reports/viability-risk?siteId=&lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=",
         "GET /batches/:id/viability",
         "GET /locations/sites",
@@ -487,7 +488,13 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && url.pathname === "/reports/inventory") {
       const siteIdParam = url.searchParams.get("siteId");
-      const report = await getInventoryWithFrozen(siteIdParam || null);
+      const reservationFilters = {
+        applicant: url.searchParams.get("applicant") || "",
+        plannedDateFrom: url.searchParams.get("plannedDateFrom") || "",
+        plannedDateTo: url.searchParams.get("plannedDateTo") || ""
+      };
+      const hasFilters = Object.values(reservationFilters).some(v => v);
+      const report = await getInventoryWithFrozen(siteIdParam || null, hasFilters ? reservationFilters : null);
       return send(res, 200, report);
     }
     send(res, 404, { error: "not_found" });

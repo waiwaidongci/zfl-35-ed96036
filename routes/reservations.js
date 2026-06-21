@@ -12,6 +12,21 @@ function makeCtx(req, body) {
 
 const routes = [
   {
+    method: "GET",
+    pattern: /^\/reservations$/,
+    handler: async (req, _res, _body) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const filters = {
+        status: url.searchParams.get("status") || "",
+        applicant: url.searchParams.get("applicant") || "",
+        plannedDateFrom: url.searchParams.get("plannedDateFrom") || "",
+        plannedDateTo: url.searchParams.get("plannedDateTo") || "",
+        siteId: url.searchParams.get("siteId") || ""
+      };
+      return store.listAllReservations(filters);
+    }
+  },
+  {
     method: "POST",
     pattern: /^\/batches\/([^/]+)\/reservations$/,
     handler: async (req, _res, body, params) => store.createReservation(params[1], body, makeCtx(req, body))
