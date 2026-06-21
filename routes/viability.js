@@ -1,24 +1,57 @@
 import * as viabilityStore from "../lib/viability-trend.js";
 
+function parseRetestOptions(url) {
+  const options = {};
+  const lowRateThreshold = url.searchParams.get("lowRateThreshold");
+  const consecutiveDeclineThreshold = url.searchParams.get("consecutiveDeclineThreshold");
+  const longTermDays = url.searchParams.get("longTermDays");
+  const significantChangeThreshold = url.searchParams.get("significantChangeThreshold");
+  const standardRetestIntervalDays = url.searchParams.get("standardRetestIntervalDays");
+  const highPriorityRetestDays = url.searchParams.get("highPriorityRetestDays");
+  const mediumPriorityRetestDays = url.searchParams.get("mediumPriorityRetestDays");
+  const lowPriorityRetestDays = url.searchParams.get("lowPriorityRetestDays");
+
+  if (lowRateThreshold) options.lowRateThreshold = Number(lowRateThreshold);
+  if (consecutiveDeclineThreshold) options.consecutiveDeclineThreshold = Number(consecutiveDeclineThreshold);
+  if (longTermDays) options.longTermDays = Number(longTermDays);
+  if (significantChangeThreshold) options.significantChangeThreshold = Number(significantChangeThreshold);
+  if (standardRetestIntervalDays) options.standardRetestIntervalDays = Number(standardRetestIntervalDays);
+  if (highPriorityRetestDays) options.highPriorityRetestDays = Number(highPriorityRetestDays);
+  if (mediumPriorityRetestDays) options.mediumPriorityRetestDays = Number(mediumPriorityRetestDays);
+  if (lowPriorityRetestDays) options.lowPriorityRetestDays = Number(lowPriorityRetestDays);
+
+  return options;
+}
+
 const routes = [
   {
     method: "GET",
     pattern: /^\/reports\/viability-risk$/,
     handler: async (req) => {
       const url = new URL(req.url, `http://${req.headers.host}`);
-      const options = {};
-      const lowRateThreshold = url.searchParams.get("lowRateThreshold");
-      const consecutiveDeclineThreshold = url.searchParams.get("consecutiveDeclineThreshold");
-      const longTermDays = url.searchParams.get("longTermDays");
-      const significantChangeThreshold = url.searchParams.get("significantChangeThreshold");
+      const options = parseRetestOptions(url);
       const siteId = url.searchParams.get("siteId") || null;
-
-      if (lowRateThreshold) options.lowRateThreshold = Number(lowRateThreshold);
-      if (consecutiveDeclineThreshold) options.consecutiveDeclineThreshold = Number(consecutiveDeclineThreshold);
-      if (longTermDays) options.longTermDays = Number(longTermDays);
-      if (significantChangeThreshold) options.significantChangeThreshold = Number(significantChangeThreshold);
-
-      return viabilityStore.generateViabilityRiskReport(options, siteId);
+      return viabilityStore.generateRetestPlanReport(options, siteId);
+    }
+  },
+  {
+    method: "GET",
+    pattern: /^\/reports\/retest-plan$/,
+    handler: async (req) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const options = parseRetestOptions(url);
+      const siteId = url.searchParams.get("siteId") || null;
+      return viabilityStore.generateRetestPlanReport(options, siteId);
+    }
+  },
+  {
+    method: "GET",
+    pattern: /^\/reports\/retest-batches$/,
+    handler: async (req) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const options = parseRetestOptions(url);
+      const siteId = url.searchParams.get("siteId") || null;
+      return viabilityStore.getRetestBatchList(options, siteId);
     }
   },
   {
@@ -26,18 +59,40 @@ const routes = [
     pattern: /^\/batches\/([^/]+)\/viability$/,
     handler: async (req, _res, _body, params) => {
       const url = new URL(req.url, `http://${req.headers.host}`);
-      const options = {};
-      const lowRateThreshold = url.searchParams.get("lowRateThreshold");
-      const consecutiveDeclineThreshold = url.searchParams.get("consecutiveDeclineThreshold");
-      const longTermDays = url.searchParams.get("longTermDays");
-      const significantChangeThreshold = url.searchParams.get("significantChangeThreshold");
-
-      if (lowRateThreshold) options.lowRateThreshold = Number(lowRateThreshold);
-      if (consecutiveDeclineThreshold) options.consecutiveDeclineThreshold = Number(consecutiveDeclineThreshold);
-      if (longTermDays) options.longTermDays = Number(longTermDays);
-      if (significantChangeThreshold) options.significantChangeThreshold = Number(significantChangeThreshold);
-
+      const options = parseRetestOptions(url);
       return viabilityStore.getBatchViabilityAnalysis(params[1], options);
+    }
+  },
+  {
+    method: "GET",
+    pattern: /^\/batches\/([^/]+)\/retest-plan$/,
+    handler: async (req, _res, _body, params) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const options = parseRetestOptions(url);
+      const analysis = await viabilityStore.getBatchViabilityAnalysis(params[1], options);
+      if (analysis && analysis.error) {
+        return analysis;
+      }
+      if (!analysis) {
+        return { error: "batch_not_found" };
+      }
+      return {
+        batchId: analysis.batchId,
+        retestPriority: analysis.retestPriority,
+        priorityScore: analysis.priorityScore,
+        retestReasons: analysis.retestReasons,
+        ruleTriggers: analysis.ruleTriggers,
+        suggestedRetestDate: analysis.suggestedRetestDate,
+        retestIntervalDays: analysis.retestIntervalDays,
+        latestRate: analysis.latestRate,
+        latestRateFormatted: analysis.latestRateFormatted,
+        daysSinceLastTest: analysis.daysSinceLastTest,
+        lastTestDate: analysis.lastTestDate,
+        trendDirection: analysis.trendDirection,
+        pendingReviewCount: analysis.pendingReviewCount,
+        germinationCount: analysis.germinationCount
+
+      };
     }
   }
 ];

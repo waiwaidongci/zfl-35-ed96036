@@ -11,7 +11,7 @@ import { handleAuditRoutes } from "./routes/audit.js";
 import { getInventoryWithFrozen } from "./lib/reservation-store.js";
 import { scanAndDetectAnomalies } from "./lib/temperature-anomaly.js";
 import { splitBatch, mergeBatches, ensureLineageFields } from "./lib/batch-lineage.js";
-import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability } from "./lib/viability-trend.js";
+import { getBatchTrendSummary, filterBatchesByRisk, analyzeBatchViability, filterBatchesByRetestPriority } from "./lib/viability-trend.js";
 import {
   loadDb,
   mutate,
@@ -100,7 +100,7 @@ const server = http.createServer(async (req, res) => {
         "GET /sites/:id",
         "POST /sites",
         "PATCH /sites/:id",
-        "GET /batches?siteId=&species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=",
+        "GET /batches?siteId=&species=&collectionPlace=&section=&viability=&hasPendingReview=&status=&riskLevel=&retestPriority=",
         "POST /batches",
         "GET /batches/:id",
         "PATCH /batches/:id/remark",
@@ -124,7 +124,10 @@ const server = http.createServer(async (req, res) => {
         "GET /reservations?status=&applicant=&plannedDateFrom=&plannedDateTo=&siteId=",
         "GET /reports/inventory?siteId=&applicant=&plannedDateFrom=&plannedDateTo=&reservationStatus=",
         "GET /reports/viability-risk?siteId=&lowRateThreshold=&consecutiveDeclineThreshold=&longTermDays=",
+        "GET /reports/retest-plan?siteId=&lowRateThreshold=&longTermDays=&standardRetestIntervalDays=",
+        "GET /reports/retest-batches?siteId=&lowRateThreshold=",
         "GET /batches/:id/viability",
+        "GET /batches/:id/retest-plan",
         "GET /locations/sites",
         "GET /locations/sections?siteId=",
         "POST /locations/sections",
@@ -225,6 +228,13 @@ const server = http.createServer(async (req, res) => {
         const validLevels = ["normal", "warning", "critical", "unknown"];
         if (validLevels.includes(riskLevel)) {
           rows = filterBatchesByRisk(rows, riskLevel);
+        }
+      }
+      const retestPriority = url.searchParams.get("retestPriority");
+      if (retestPriority) {
+        const validPriorities = ["urgent", "high", "medium", "low", "none", "all_need_retest"];
+        if (validPriorities.includes(retestPriority)) {
+          rows = filterBatchesByRetestPriority(rows, retestPriority);
         }
       }
       for (const batch of rows) {
