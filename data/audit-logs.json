@@ -528,6 +528,96 @@
         "thresholdBefore": null,
         "thresholdAfter": null
       }
+    },
+    {
+      "id": "AUD-1782021975833-chcqn8",
+      "timestamp": "2026-06-21T06:06:15.833Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/site/SITE-002"
+      },
+      "operation": "temperature_threshold_site_update",
+      "entityType": "site",
+      "entityId": "SITE-002",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "siteId": "SITE-002",
+        "thresholdBefore": -17,
+        "thresholdAfter": -17
+      }
+    },
+    {
+      "id": "AUD-1782021975868-626wzc",
+      "timestamp": "2026-06-21T06:06:15.868Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/section/A3"
+      },
+      "operation": "temperature_threshold_section_update",
+      "entityType": "section",
+      "entityId": "A3",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "sectionId": "A3",
+        "threshold": -20
+      }
+    },
+    {
+      "id": "AUD-1782022000591-q2kdvy",
+      "timestamp": "2026-06-21T06:06:40.591Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/site/SITE-002"
+      },
+      "operation": "temperature_threshold_site_update",
+      "entityType": "site",
+      "entityId": "SITE-002",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "siteId": "SITE-002",
+        "thresholdBefore": null,
+        "thresholdAfter": null
+      }
+    },
+    {
+      "id": "AUD-1782022000631-7sz8ue",
+      "timestamp": "2026-06-21T06:06:40.631Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /temperature-thresholds/section/A3"
+      },
+      "operation": "temperature_threshold_section_update",
+      "entityType": "section",
+      "entityId": "A3",
+      "affectedBatches": [],
+      "changes": {
+        "before": {},
+        "after": {}
+      },
+      "details": {
+        "sectionId": "A3",
+        "threshold": null
+      }
     }
   ]
 }
