@@ -27,7 +27,16 @@
           "id": "C-冷盒-07",
           "name": "冷盒07",
           "slotCapacity": 16,
-          "slots": []
+          "slots": [
+            {
+              "index": 2,
+              "batchId": "RS-002"
+            },
+            {
+              "index": 3,
+              "batchId": "RS-004"
+            }
+          ]
         },
         {
           "id": "C-冷盒-08",
@@ -36,7 +45,7 @@
           "slots": [
             {
               "index": 1,
-              "batchId": "RS-001"
+              "batchId": null
             },
             {
               "index": 2,
@@ -95,7 +104,12 @@
           "id": "C-冷盒-10",
           "name": "冷盒10",
           "slotCapacity": 16,
-          "slots": []
+          "slots": [
+            {
+              "index": 5,
+              "batchId": "RS-003"
+            }
+          ]
         }
       ]
     },

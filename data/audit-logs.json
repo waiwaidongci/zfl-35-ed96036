@@ -1,0 +1,328 @@
+{
+  "logs": [
+    {
+      "id": "AUD-1782016892026-6hk7op",
+      "timestamp": "2026-06-21T04:41:32.026Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /locations/boxes/C-%e5%86%b7%e7%9b%92-07/slots/2"
+      },
+      "operation": "location_slot_assign",
+      "entityType": "location_slot",
+      "entityId": "C-冷盒-07:2",
+      "affectedBatches": [
+        "RS-002"
+      ],
+      "changes": {
+        "before": {
+          "RS-002": {
+            "id": "RS-002",
+            "siteId": "SITE-001",
+            "species": "珙桐",
+            "collectionPlace": "峨眉山",
+            "container": "C-冷盒-07",
+            "section": "A2",
+            "viability": "medium",
+            "quantity": 950,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "珙桐种子，注意观察活性变化趋势",
+            "transactionsCount": 2,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 0
+          }
+        },
+        "after": {
+          "RS-002": {
+            "id": "RS-002",
+            "siteId": "SITE-001",
+            "species": "珙桐",
+            "collectionPlace": "峨眉山",
+            "container": "C-冷盒-07",
+            "section": "A2",
+            "viability": "medium",
+            "quantity": 950,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "珙桐种子，注意观察活性变化趋势",
+            "transactionsCount": 2,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 0
+          }
+        }
+      },
+      "details": {
+        "boxId": "C-冷盒-07",
+        "boxName": "冷盒07",
+        "slotIndex": 2,
+        "sectionId": "A2",
+        "sectionName": "A2低温区",
+        "siteId": "SITE-001",
+        "previousBatchId": null,
+        "newBatchId": "RS-002",
+        "changeType": "assign",
+        "batchSiteMatch": true,
+        "originalContainer": "C-冷盒-09",
+        "originalSection": "A2",
+        "newContainer": "C-冷盒-07",
+        "newSection": "A2",
+        "containerChanged": true,
+        "sectionChanged": false,
+        "changeNote": "批次 RS-002 分配到 A2低温区 / 冷盒07 / 格位2，已同步更新批次 container 和 section 字段。"
+      }
+    },
+    {
+      "id": "AUD-1782016922282-wzvuoy",
+      "timestamp": "2026-06-21T04:42:02.282Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /locations/boxes/C-%e5%86%b7%e7%9b%92-08/slots/1"
+      },
+      "operation": "location_slot_assign",
+      "entityType": "location_slot",
+      "entityId": "C-冷盒-08:1",
+      "affectedBatches": [
+        "RS-001"
+      ],
+      "changes": {
+        "before": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1800,
+            "status": "active",
+            "frozenQuantity": 100,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 3
+          }
+        },
+        "after": {
+          "RS-001": {
+            "id": "RS-001",
+            "siteId": "SITE-001",
+            "species": "独叶草",
+            "collectionPlace": "西岭北坡",
+            "container": "C-冷盒-08",
+            "section": "A2",
+            "viability": "high",
+            "quantity": 1800,
+            "status": "active",
+            "frozenQuantity": 100,
+            "remark": "初始入库批次，待质量复核",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 4,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 3
+          }
+        }
+      },
+      "details": {
+        "boxId": "C-冷盒-08",
+        "boxName": "冷盒08",
+        "slotIndex": 1,
+        "sectionId": "A2",
+        "sectionName": "A2低温区",
+        "siteId": "SITE-001",
+        "previousBatchId": "RS-001",
+        "previousBatchSnapshot": {
+          "id": "RS-001",
+          "siteId": "SITE-001",
+          "container": "C-冷盒-08",
+          "section": "A2"
+        },
+        "newBatchId": null,
+        "changeType": "clear",
+        "changeNote": "清空槽位 C-冷盒-08:1，原批次 RS-001 已移出。批次的 container/section 字段保留历史值。",
+        "clearedFrom": {
+          "sectionId": "A2",
+          "sectionName": "A2低温区",
+          "boxId": "C-冷盒-08",
+          "boxName": "冷盒08",
+          "slotIndex": 1,
+          "siteId": "SITE-001",
+          "clearedAt": "2026-06-21T04:42:02.282Z"
+        }
+      }
+    },
+    {
+      "id": "AUD-1782017008428-dwexrd",
+      "timestamp": "2026-06-21T04:43:28.428Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /locations/boxes/C-%e5%86%b7%e7%9b%92-10/slots/5"
+      },
+      "operation": "location_slot_assign",
+      "entityType": "location_slot",
+      "entityId": "C-冷盒-10:5",
+      "affectedBatches": [
+        "RS-003"
+      ],
+      "changes": {
+        "before": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 1
+          }
+        },
+        "after": {
+          "RS-003": {
+            "id": "RS-003",
+            "siteId": "SITE-001",
+            "species": "红豆杉",
+            "collectionPlace": "神农架",
+            "container": "C-冷盒-10",
+            "section": "A3",
+            "viability": "high",
+            "quantity": 2200,
+            "status": "active",
+            "frozenQuantity": 0,
+            "remark": "红豆杉种子，活性很高，定期复测",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 3,
+            "reviewsCount": 1,
+            "reservationsCount": 0,
+            "anomaliesCount": 1
+          }
+        }
+      },
+      "details": {
+        "boxId": "C-冷盒-10",
+        "boxName": "冷盒10",
+        "slotIndex": 5,
+        "sectionId": "A3",
+        "sectionName": "A3中温区",
+        "siteId": "SITE-001",
+        "previousBatchId": null,
+        "newBatchId": "RS-003",
+        "changeType": "assign",
+        "batchSiteMatch": true,
+        "originalContainer": "C-冷盒-10",
+        "originalSection": "A3",
+        "newContainer": "C-冷盒-10",
+        "newSection": "A3",
+        "containerChanged": false,
+        "sectionChanged": false,
+        "changeNote": "批次 RS-003 分配到 A3中温区 / 冷盒10 / 格位5，已同步更新批次 container 和 section 字段。"
+      }
+    },
+    {
+      "id": "AUD-1782017021355-c85wfs",
+      "timestamp": "2026-06-21T04:43:41.355Z",
+      "operator": "系统自动",
+      "source": {
+        "ip": "unknown",
+        "userAgent": "curl/8.7.1",
+        "endpoint": "PATCH /locations/boxes/C-%e5%86%b7%e7%9b%92-07/slots/3"
+      },
+      "operation": "location_slot_assign",
+      "entityType": "location_slot",
+      "entityId": "C-冷盒-07:3",
+      "affectedBatches": [
+        "RS-004"
+      ],
+      "changes": {
+        "before": {
+          "RS-004": {
+            "id": "RS-004",
+            "siteId": "SITE-001",
+            "species": "望天树",
+            "collectionPlace": "西双版纳",
+            "container": "C-冷盒-07",
+            "section": "A2",
+            "viability": "low",
+            "quantity": 600,
+            "status": "active",
+            "frozenQuantity": 80,
+            "remark": "望天树种子，初始萌发率偏低，需要重点关注",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 1,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 0
+          }
+        },
+        "after": {
+          "RS-004": {
+            "id": "RS-004",
+            "siteId": "SITE-001",
+            "species": "望天树",
+            "collectionPlace": "西双版纳",
+            "container": "C-冷盒-07",
+            "section": "A2",
+            "viability": "low",
+            "quantity": 600,
+            "status": "active",
+            "frozenQuantity": 80,
+            "remark": "望天树种子，初始萌发率偏低，需要重点关注",
+            "transactionsCount": 1,
+            "temperaturesCount": 5,
+            "germinationsCount": 1,
+            "reviewsCount": 1,
+            "reservationsCount": 1,
+            "anomaliesCount": 0
+          }
+        }
+      },
+      "details": {
+        "boxId": "C-冷盒-07",
+        "boxName": "冷盒07",
+        "slotIndex": 3,
+        "sectionId": "A2",
+        "sectionName": "A2低温区",
+        "siteId": "SITE-001",
+        "previousBatchId": null,
+        "newBatchId": "RS-004",
+        "changeType": "assign",
+        "batchSiteMatch": true,
+        "originalContainer": "C-冷盒-11",
+        "originalSection": "A3",
+        "newContainer": "C-冷盒-07",
+        "newSection": "A2",
+        "containerChanged": true,
+        "sectionChanged": true,
+        "changeNote": "批次 RS-004 分配到 A2低温区 / 冷盒07 / 格位3，已同步更新批次 container 和 section 字段。"
+      }
+    }
+  ]
+}
